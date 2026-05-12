@@ -27,6 +27,7 @@ const[eI,sEI]=useState(null);const[eF,sEF]=useState({});const[ld,sLd]=useState(1
 const[q,sQ]=useState("");const[dB,sDB]=useState([]);const[dT,sDT]=useState([]);
 const[fb,sFb]=useState("");const[fo,sFo]=useState(0);
 const[M,sM]=useState([]);const[eM,sEM]=useState(null);const[eMf,sEMf]=useState({});const[nM,sNM]=useState(0);const[DBs,sDBs]=useState(DB);
+const[w,sW]=useState(typeof window!=="undefined"?window.innerWidth:1024);
 const[qa,sQa]=useState(0);const[qaF,sQaF]=useState({h:"",r:"",ti:"",pr:"medium",c:"overig",w:"",dl:"",tp:"nodig"});const[atF,sAtF]=useState({h:"all",s:"all",w:"all"});
 
 
@@ -48,7 +49,7 @@ useEffect(()=>{
   if(!r){S("zr",iR);S("zt",iT);S("zm",iM)}
   sLd(0);
 },[]);
-
+useEffect(()=>{const h=()=>sW(window.innerWidth);window.addEventListener("resize",h);return()=>window.removeEventListener("resize",h)},[]);
 const uT=n=>{sT(n);S("zt",n)};
 const uR=n=>{sR(n);S("zr",n)};
 
@@ -63,8 +64,8 @@ if(!U)return(<div style={{minHeight:"100vh",background:st.bg,color:"#fff",displa
 <div style={{flex:1}}><div style={{fontSize:13,fontWeight:600}}>{b.n}</div><div style={{fontSize:10,color:"#555"}}>{b.r}</div></div>
 <span style={{fontSize:9,padding:"2px 6px",borderRadius:4,background:b.p==="admin"?"#7f1d1d":"#1a1a2e",color:b.p==="admin"?"#fca5a5":"#94a3b8"}}>{b.p==="admin"?"admin":b.r}</span>
 </button>)}</div></div>);
-
-const nav=()=><div style={{display:"flex",background:"#0a0a0a",borderTop:"1px solid #1a1a1a",padding:"6px 2px",position:"sticky",bottom:0,marginTop:12}}>
+const isDesktop=w>=768;
+const nav=()=><div style={{display:"flex",background:"#0a0a0a",borderTop:"1px solid #1a1a1a",padding:"6px 2px",position:"fixed",bottom:0,left:0,right:0,zIndex:100}}>
 {[["home","🏠","Home"],["search","🔍","Zoek"],["dag","☀️","Dag"],["mile","🎯","Mijlp"],["team","👥","Team"]].map(([id,ic,lb])=>
 <button key={id} onClick={()=>{sTb(id);sCH(null);sCR(null)}} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:1,background:"none",border:"none",cursor:"pointer",padding:"3px 0",color:tb===id?"#dc2626":"#444",fontSize:14}}><span>{ic}</span><span style={{fontSize:8,fontWeight:600}}>{lb}</span></button>)}
 <button onClick={()=>{sU(null);S("zu",null)}} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1,background:"none",border:"none",cursor:"pointer",padding:"3px 6px",color:"#333",fontSize:14}}><span>↩</span><span style={{fontSize:8}}>Uit</span></button></div>;
@@ -72,7 +73,7 @@ const nav=()=><div style={{display:"flex",background:"#0a0a0a",borderTop:"1px so
 const fbBtn=()=><div style={{marginTop:10}}>{!fo?<button onClick={()=>sFo(1)} style={{width:"100%",...bx,cursor:"pointer",color:"#444",fontSize:10,border:"1px dashed #333",textAlign:"center"}}>💬 Feedback</button>
 :<div style={{...bx,border:`1px solid ${st.rd}`}}><textarea value={fb} onChange={e=>sFb(e.target.value)} placeholder="Wat kan beter?" style={{width:"100%",background:"#1a1a1a",border:"1px solid #333",borderRadius:6,padding:6,color:"#fff",fontSize:11,minHeight:40,resize:"vertical",boxSizing:"border-box"}}/>
 <div style={{display:"flex",gap:4,marginTop:4}}><button onClick={()=>{const o=L("zfb",[]);S("zfb",[...o,{t:fb,u:U?.n,d:TD}]);sFb("");sFo(0)}} style={btn(st.rd,"#fff")}>Verstuur</button><button onClick={()=>{sFo(0);sFb("")}} style={btn("#222","#888")}>Annuleer</button></div></div>}</div>;
-const isDesktop=typeof window!=="undefined"&&window.innerWidth>=768;
+
 const sideNav=()=><div style={{width:200,background:"#0a0a0a",borderRight:"1px solid #1a1a1a",padding:"20px 12px",display:"flex",flexDirection:"column",gap:4,position:"sticky",top:0,height:"100vh"}}>
 <div style={{padding:"0 8px 16px",borderBottom:"1px solid #1a1a1a",marginBottom:8}}>
 <div style={{fontSize:18,fontWeight:700,color:"#dc2626"}}>🎃 Horror Zone</div>
@@ -89,7 +90,7 @@ const sideNav=()=><div style={{width:200,background:"#0a0a0a",borderRight:"1px s
 const wrap=c=>isDesktop?
 <div style={{minHeight:"100vh",background:st.bg,color:"#fff",fontFamily:"system-ui",display:"flex"}}>
 {sideNav()}
-<div style={{flex:1,padding:"24px 32px",maxWidth:900,margin:"0 auto",width:"100%"}}>{c}{fbBtn()}</div>
+<div style={{flex:1,padding:"24px 32px",width:"100%",maxWidth:1400,margin:"0 auto"}}>{c}{fbBtn()}</div>
 </div>
 :
 <div style={{minHeight:"100vh",background:st.bg,color:"#fff",padding:14,fontFamily:"system-ui",maxWidth:480,margin:"0 auto",paddingBottom:70}}>{c}{fbBtn()}{nav()}</div>;
