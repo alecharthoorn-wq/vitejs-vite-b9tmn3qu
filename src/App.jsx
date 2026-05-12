@@ -25,6 +25,7 @@ const[tb,sTb]=useState("home");const[cH,sCH]=useState(null);const[cR,sCR]=useSta
 const[eI,sEI]=useState(null);const[eF,sEF]=useState({});const[ld,sLd]=useState(1);
 const[q,sQ]=useState("");const[dB,sDB]=useState([]);const[dT,sDT]=useState([]);
 const[fb,sFb]=useState("");const[fo,sFo]=useState(0);
+const[qa,sQa]=useState(0);const[qaF,sQaF]=useState({h:"",r:"",ti:"",pr:"medium",c:"overig",w:"",dl:"",tp:"nodig"});const[atF,sAtF]=useState({h:"all",s:"all",w:"all"});
 
 useEffect(()=>{
   const r=L("zr",null);
@@ -99,27 +100,7 @@ style={{background:"none",border:"none",marginTop:1,cursor:ed?"pointer":"default
 <button onClick={()=>uT(T.filter(x=>x.id!==t.id))} style={{background:"none",border:"none",color:"#333",cursor:"pointer",padding:2,fontSize:11}}>🗑</button></div>}
 </div></div>};
 
-const isDesktop=typeof window!=="undefined"&&window.innerWidth>=768;
-const sideNav=()=><div style={{width:200,background:"#0a0a0a",borderRight:"1px solid #1a1a1a",padding:"20px 12px",display:"flex",flexDirection:"column",gap:4,position:"sticky",top:0,height:"100vh"}}>
-<div style={{padding:"0 8px 16px",borderBottom:"1px solid #1a1a1a",marginBottom:8}}>
-<div style={{fontSize:18,fontWeight:700,color:"#dc2626"}}>🎃 Horror Zone</div>
-<div style={{fontSize:10,color:"#444",marginTop:2}}>{U?.n}</div>
-</div>
-{[["home","🏠","Home"],["search","🔍","Zoeken"],["dag","☀️","Dagstart"],["team","👥","Team"]].map(([id,ic,lb])=>
-<button key={id} onClick={()=>{sTb(id);sCH(null);sCR(null)}} style={{display:"flex",alignItems:"center",gap:10,background:tb===id?"#1a1a1a":"none",border:"none",cursor:"pointer",padding:"10px 12px",color:tb===id?"#dc2626":"#888",fontSize:13,borderRadius:6,textAlign:"left",fontWeight:tb===id?600:400}}>
-<span style={{fontSize:16}}>{ic}</span><span>{lb}</span></button>)}
-<div style={{marginTop:"auto",paddingTop:8,borderTop:"1px solid #1a1a1a"}}>
-<button onClick={()=>{sU(null);S("zu",null)}} style={{display:"flex",alignItems:"center",gap:10,background:"none",border:"none",cursor:"pointer",padding:"10px 12px",color:"#666",fontSize:13,borderRadius:6,textAlign:"left",width:"100%"}}>
-<span style={{fontSize:16}}>↩</span><span>Uitloggen</span></button>
-</div>
-</div>;
-const wrap=c=>isDesktop?
-<div style={{minHeight:"100vh",background:st.bg,color:"#fff",fontFamily:"system-ui",display:"flex"}}>
-{sideNav()}
-<div style={{flex:1,padding:"24px 32px",maxWidth:900,margin:"0 auto",width:"100%"}}>{c}{fbBtn()}</div>
-</div>
-:
-<div style={{minHeight:"100vh",background:st.bg,color:"#fff",padding:14,fontFamily:"system-ui",maxWidth:480,margin:"0 auto",paddingBottom:70}}>{c}{fbBtn()}{nav()}</div>;
+
 
 // ROOM
 if(cR){const rm=cR,ho=DH.find(x=>x.id===rm.h),rt=T.filter(t=>t.r===rm.id),pr=rP(rm.id,T);
@@ -202,9 +183,34 @@ if(tb==="team")return wrap(<>
 
 // HOME
 const tt=T.length,dn=T.filter(t=>t.s==="completed").length,ip=T.filter(t=>t.s==="in_progress").length,od=T.filter(t=>t.s!=="completed"&&t.dl&&t.dl<TD).length,tp=tt?Math.round(dn/tt*100):0;
+const roomsForHouse=qaF.h?R.filter(r=>r.h===qaF.h):[];
+const atFiltered=T.filter(t=>{if(atF.h!=="all"&&t.h!==atF.h)return 0;if(atF.s!=="all"&&t.s!==atF.s)return 0;if(atF.w!=="all"&&t.w!==atF.w)return 0;return 1});
 return wrap(<>
 <h1 style={{fontSize:17,fontWeight:700}}>🎃 Horror Zone</h1><p style={{fontSize:10,color:"#444",marginBottom:6}}>{new Date().toLocaleDateString("nl-NL",{weekday:"short",day:"numeric",month:"short"})}</p>
 <div style={{...bx,padding:6,marginBottom:6,display:"flex",alignItems:"center",gap:6,fontSize:10,color:"#444"}}><div style={{width:20,height:20,borderRadius:"50%",background:"#1a1a1a",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontSize:9,color:"#555"}}>{U.n[0]}</div>{U.n}<span style={{marginLeft:"auto",fontSize:8,padding:"1px 4px",borderRadius:3,background:"#1a1a1a",color:"#333"}}>{am?"admin":U.r}</span></div>
+
+{am&&<div style={{marginBottom:10}}>
+{!qa?<button onClick={()=>sQa(1)} style={{width:"100%",background:st.rd,color:"#fff",border:"none",borderRadius:8,padding:"10px 14px",cursor:"pointer",fontSize:13,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>+ Nieuwe taak</button>
+:<div style={{...bx,border:`1px solid ${st.rd}`,padding:10}}>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}><span style={{fontSize:11,fontWeight:600}}>Nieuwe taak</span><button onClick={()=>{sQa(0);sQaF({h:"",r:"",ti:"",pr:"medium",c:"overig",w:"",dl:"",tp:"nodig"})}} style={{background:"none",border:"none",color:"#666",cursor:"pointer",fontSize:14}}>✕</button></div>
+<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:5,marginBottom:5}}>
+<select value={qaF.h} onChange={e=>sQaF({...qaF,h:e.target.value,r:""})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11}}><option value="">Kies huis…</option>{DH.map(h=><option key={h.id} value={h.id}>{h.n}</option>)}</select>
+<select value={qaF.r} onChange={e=>sQaF({...qaF,r:e.target.value})} disabled={!qaF.h} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11,opacity:qaF.h?1:.5}}><option value="">Kies kamer…</option>{roomsForHouse.map(r=><option key={r.id} value={r.id}>{r.n}</option>)}</select>
+</div>
+<input value={qaF.ti} onChange={e=>sQaF({...qaF,ti:e.target.value})} placeholder="Taaknaam" style={{width:"100%",background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11,marginBottom:5,boxSizing:"border-box"}}/>
+<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:5,marginBottom:5}}>
+<select value={qaF.pr} onChange={e=>sQaF({...qaF,pr:e.target.value})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11}}>{["low","medium","high","critical"].map(v=><option key={v}>{v}</option>)}</select>
+<select value={qaF.c} onChange={e=>sQaF({...qaF,c:e.target.value})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11}}>{CS.map(v=><option key={v}>{v}</option>)}</select>
+<select value={qaF.tp} onChange={e=>sQaF({...qaF,tp:e.target.value})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11}}><option value="nodig">Nodig</option><option value="nice">Nice</option></select>
+</div>
+<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:5,marginBottom:8}}>
+<select value={qaF.w} onChange={e=>sQaF({...qaF,w:e.target.value})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11}}><option value="">Toewijzen aan…</option>{DB.map(b=><option key={b.id} value={b.id}>{b.n}</option>)}</select>
+<input type="date" value={qaF.dl} onChange={e=>sQaF({...qaF,dl:e.target.value})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11}}/>
+</div>
+<button onClick={()=>{if(!qaF.h||!qaF.r||!qaF.ti)return;uT([...T,{id:"t"+Date.now(),r:qaF.r,h:qaF.h,ti:qaF.ti,s:"not_started",pr:qaF.pr,c:qaF.c,w:qaF.w,dl:qaF.dl,nt:"",tp:qaF.tp,sb:[]}]);sQa(0);sQaF({h:"",r:"",ti:"",pr:"medium",c:"overig",w:"",dl:"",tp:"nodig"})}} disabled={!qaF.h||!qaF.r||!qaF.ti} style={{...btn(st.gn,"#fff"),width:"100%",padding:"6px 10px",opacity:qaF.h&&qaF.r&&qaF.ti?1:.5,cursor:qaF.h&&qaF.r&&qaF.ti?"pointer":"not-allowed"}}>Taak toevoegen</button>
+</div>}
+</div>}
+
 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4,marginBottom:10}}>
 {[{l:"Voortgang",v:tp+"%",c:st.rd},{l:"Afgerond",v:dn+"/"+tt,c:st.gn},{l:"Bezig",v:ip,c:st.yw},{l:"Achterstand",v:od,c:od?"#ef4444":"#333"}].map((x,i)=>
 <div key={i} style={{...bx,textAlign:"center",padding:6}}><div style={{fontSize:8,color:"#444"}}>{x.l}</div><div style={{fontSize:16,fontWeight:700,color:x.c}}>{x.v}</div></div>)}</div>
@@ -216,5 +222,28 @@ return<button key={h.id} onClick={()=>sCH(h)} style={{width:"100%",...bx,borderR
 <div style={{display:"flex",alignItems:"center",gap:4}}><div style={{flex:1,height:4,background:"#1a1a1a",borderRadius:2,overflow:"hidden"}}><div style={{height:"100%",background:pr===100?st.gn:st.rd,width:`${pr}%`}}/></div><span style={{fontSize:10,fontWeight:700,color:pr===100?st.gn:st.rd}}>{pr}%</span></div></button>})}
 {od>0&&<div style={{marginTop:6}}><div style={{fontSize:8,color:"#ef4444",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:3}}>⚠Achterstand</div>
 {T.filter(t=>t.s!=="completed"&&t.dl&&t.dl<TD).slice(0,3).map(t=><div key={t.id} style={{background:"#1a0505",border:"1px solid #7f1d1d",borderRadius:6,padding:5,marginBottom:3,display:"flex",justifyContent:"space-between"}}><span style={{fontSize:10,color:"#fca5a5"}}>{t.ti}</span><span style={{fontSize:9,color:"#ef4444"}}>{t.dl}</span></div>)}</div>}
+
+{am&&<div style={{marginTop:14}}>
+<div style={{fontSize:8,color:"#444",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>Alle taken (admin) — {atFiltered.length}</div>
+<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4,marginBottom:6}}>
+<select value={atF.h} onChange={e=>sAtF({...atF,h:e.target.value})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:4,color:"#fff",fontSize:10}}><option value="all">Alle huizen</option>{DH.map(h=><option key={h.id} value={h.id}>{h.n}</option>)}</select>
+<select value={atF.s} onChange={e=>sAtF({...atF,s:e.target.value})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:4,color:"#fff",fontSize:10}}><option value="all">Alle statussen</option><option value="not_started">Niet gestart</option><option value="in_progress">Bezig</option><option value="completed">Klaar</option></select>
+<select value={atF.w} onChange={e=>sAtF({...atF,w:e.target.value})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:4,color:"#fff",fontSize:10}}><option value="all">Alle personen</option><option value="">Niet toegewezen</option>{DB.map(b=><option key={b.id} value={b.id}>{b.n}</option>)}</select>
+</div>
+{atFiltered.length===0?<div style={{...bx,textAlign:"center",color:"#333",fontSize:10,padding:10}}>Geen taken met deze filters</div>
+:atFiltered.map(t=>{const r=R.find(x=>x.id===t.r),h=DH.find(x=>x.id===t.h),a=DB.find(b=>b.id===t.w),od=t.s!=="completed"&&t.dl&&t.dl<TD;
+return<div key={t.id} onClick={()=>{sCH(h);sCR(r)}} style={{...bx,cursor:"pointer",padding:7,display:"flex",alignItems:"center",gap:6,borderColor:od?"#7f1d1d":"#222"}}>
+<span style={{fontSize:14,color:t.s==="completed"?"#4ade80":t.s==="in_progress"?"#facc15":"#555"}}>{t.s==="completed"?"✅":t.s==="in_progress"?"🔄":"⭕"}</span>
+<div style={{flex:1,minWidth:0}}>
+<div style={{fontSize:11,fontWeight:500,color:t.s==="completed"?"#444":"#fff",textDecoration:t.s==="completed"?"line-through":"none"}}>{t.ti}</div>
+<div style={{fontSize:9,color:"#444",display:"flex",gap:5,flexWrap:"wrap"}}>
+<span>🏠{h?.n}→{r?.n}</span>{a&&<span>👤{a.n}</span>}{t.dl&&<span style={{color:od?"#ef4444":""}}>📅{t.dl}</span>}
+<span style={{padding:"0 4px",borderRadius:3,background:t.tp==="nodig"?"#1a0505":"#05051a",color:t.tp==="nodig"?"#f87171":"#60a5fa"}}>{t.tp}</span>
+</div>
+</div>
+<span style={{color:"#333",fontSize:11}}>›</span>
+</div>})}
+</div>}
 </>);
+}
 }
