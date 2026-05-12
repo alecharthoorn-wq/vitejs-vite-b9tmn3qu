@@ -29,7 +29,7 @@ const[fb,sFb]=useState("");const[fo,sFo]=useState(0);
 const[M,sM]=useState([]);const[eM,sEM]=useState(null);const[eMf,sEMf]=useState({});const[nM,sNM]=useState(0);const[DBs,sDBs]=useState(DB);
 const[w,sW]=useState(typeof window!=="undefined"?window.innerWidth:1024);
 const[qa,sQa]=useState(0);const[qaF,sQaF]=useState({h:"",r:"",ti:"",pr:"medium",c:"overig",w:"",dl:"",tp:"nodig"});const[atF,sAtF]=useState({h:"all",s:"all",w:"all"});
-
+const[nB,sNB]=useState(0);const[nBf,sNBf]=useState({n:"",r:"bouw",p:"normaal"});
 
 useEffect(()=>{
   const r=L("zr",null);
@@ -52,6 +52,8 @@ useEffect(()=>{
 useEffect(()=>{const h=()=>sW(window.innerWidth);window.addEventListener("resize",h);return()=>window.removeEventListener("resize",h)},[]);
 const uT=n=>{sT(n);S("zt",n)};
 const uR=n=>{sR(n);S("zr",n)};
+const uM=n=>{sM(n);S("zm",n)};
+const uDBs=n=>{sDBs(n);S("zdb",n)};
 
 if(ld)return <div style={{display:"flex",justifyContent:"center",alignItems:"center",height:"100vh",color:"#666",fontFamily:"system-ui"}}>Laden...</div>;
 const am=U?.p==="admin";
@@ -87,13 +89,14 @@ const sideNav=()=><div style={{width:200,background:"#0a0a0a",borderRight:"1px s
 <span style={{fontSize:16}}>↩</span><span>Uitloggen</span></button>
 </div>
 </div>;
+const demoBanner=<div style={{background:"#1a1500",border:"1px solid #854d0e",borderRadius:6,padding:"6px 10px",marginBottom:10,fontSize:10,color:"#ca8a04",display:"flex",alignItems:"center",gap:6}}>⚠ <span><b>Demoversie:</b> jouw wijzigingen worden lokaal opgeslagen en zijn niet zichtbaar voor andere gebruikers. Gedeelde opslag volgt in een latere versie.</span></div>;
 const wrap=c=>isDesktop?
 <div style={{minHeight:"100vh",background:st.bg,color:"#fff",fontFamily:"system-ui",display:"flex"}}>
 {sideNav()}
-<div style={{flex:1,padding:"24px 32px",width:"100%",maxWidth:1400,margin:"0 auto"}}>{c}{fbBtn()}</div>
+<div style={{flex:1,padding:"24px 32px",width:"100%",maxWidth:1400,margin:"0 auto"}}>{demoBanner}{c}{fbBtn()}</div>
 </div>
 :
-<div style={{minHeight:"100vh",background:st.bg,color:"#fff",padding:14,fontFamily:"system-ui",maxWidth:480,margin:"0 auto",paddingBottom:70}}>{c}{fbBtn()}{nav()}</div>;
+<div style={{minHeight:"100vh",background:st.bg,color:"#fff",padding:14,fontFamily:"system-ui",maxWidth:480,margin:"0 auto",paddingBottom:70}}>{demoBanner}{c}{fbBtn()}{nav()}</div>;
 // TASK
 const Tk=({t,sr})=>{const ed=cE(U,t.c),a=DB.find(b=>b.id===t.w),od=t.s!=="completed"&&t.dl&&t.dl<TD,sd=(t.sb||[]).filter(x=>x.d).length,st2=(t.sb||[]).length;
 const[sh,sSh]=useState(0);const rm=R.find(x=>x.id===t.r),ho=DH.find(x=>x.id===t.h);
@@ -134,7 +137,7 @@ style={{background:"none",border:"none",marginTop:1,cursor:ed?"pointer":"default
 
 // ROOM
 if(cR){const rm=cR,ho=DH.find(x=>x.id===rm.h),rt=T.filter(t=>t.r===rm.id),pr=rP(rm.id,T);
-  const tasksNodig=rt.filter(t=>t.tp==="nodig");
+  const tasksNodig=rt.filter(t=>(t.tp||"nodig")==="nodig");
   const tasksNice=rt.filter(t=>t.tp==="nice");
   
   const backBtn=<button onClick={()=>sCR(null)} style={{background:"none",border:"none",color:"#666",fontSize:11,cursor:"pointer",padding:0,marginBottom:6}}>← Terug</button>;
@@ -320,7 +323,7 @@ return wrap(<>
 
 // DAGSTART
 if(tb==="dag"){const dtT=T.filter(t=>dT.includes(t.id)),up=T.filter(t=>t.s!=="completed"&&t.dl&&t.dl<=TD&&!dT.includes(t.id)),od=T.filter(t=>t.s!=="completed"&&t.dl&&t.dl<TD);
-const dagStartNodig=dtT.filter(t=>t.tp==="nodig");
+const dagStartNodig=dtT.filter(t=>(t.tp||"nodig")==="nodig");
 const dagStartNice=dtT.filter(t=>t.tp==="nice");
 
 const dagHeader=<>
@@ -447,16 +450,37 @@ return<div key={b.id} style={{...bx,display:"flex",alignItems:"center",justifyCo
 <div style={{minWidth:0}}><div style={{fontSize:isDesktop?13:12,fontWeight:600}}>{b.n}{isMe&&<span style={{fontSize:9,color:"#666",marginLeft:4}}>(jij)</span>}</div><div style={{fontSize:isDesktop?11:9,color:"#444"}}>{b.r}</div></div>
 </div>
 <span style={{fontSize:isDesktop?11:10,whiteSpace:"nowrap"}}><span style={{color:"#4ade80"}}>{d}✓</span> <span style={{color:"#facc15"}}>{ip}⏳</span></span>
-{am&&<button onClick={()=>{if(isMe){alert("Je kunt je eigen admin-rechten niet aanpassen.");return}const newP=isAdminB?b.r:"admin";uDBs(DBs.map(x=>x.id===b.id?{...x,p:newP}:x))}} disabled={isMe} style={{padding:"3px 7px",borderRadius:4,border:`1px solid ${isAdminB?"#7f1d1d":"#333"}`,background:isAdminB?"#1a0505":"#111",color:isAdminB?"#fca5a5":"#666",fontSize:9,cursor:isMe?"not-allowed":"pointer",opacity:isMe?.4:1,whiteSpace:"nowrap"}} title={isMe?"Je kunt jezelf niet de-adminnen":isAdminB?"Klik om admin-rechten in te trekken":"Klik om admin te maken"}>{isAdminB?"Admin ✓":"Maak admin"}</button>}
+{am&&<button onClick={()=>{if(isMe){alert("Je kunt je eigen admin-rechten niet aanpassen.");return}const newP=isAdminB?b.r:"admin";const updated=DBs.map(x=>x.id===b.id?{...x,p:newP}:x);uDBs(updated)}} disabled={isMe} style={{padding:"4px 8px",borderRadius:4,border:`1px solid ${isAdminB?"#7f1d1d":"#333"}`,background:isAdminB?"#1a0505":"#111",color:isAdminB?"#fca5a5":"#666",fontSize:9,cursor:isMe?"not-allowed":"pointer",opacity:isMe?.4:1,whiteSpace:"nowrap"}} title={isMe?"Je kunt jezelf niet de-adminnen":isAdminB?"Klik om admin-rechten in te trekken":"Klik om admin te maken"}>{isAdminB?"Admin ✓":"Maak admin"}</button>}
+{am&&!isMe&&<button onClick={()=>{if(!confirm(`${b.n} verwijderen uit het team?`))return;uDBs(DBs.filter(x=>x.id!==b.id))}} style={{background:"none",border:"none",color:"#666",cursor:"pointer",fontSize:14,padding:2}} title="Verwijderen">🗑</button>}
 </div>};
 
 return wrap(<>
-<h1 style={{fontSize:isDesktop?22:17,fontWeight:700,marginBottom:isDesktop?14:8}}>👥 Team ({teamList.length})</h1>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:isDesktop?14:8}}>
+<h1 style={{fontSize:isDesktop?22:17,fontWeight:700,margin:0}}>👥 Team ({teamList.length})</h1>
+{am&&!nB&&<button onClick={()=>sNB(1)} style={btn(st.rd,"#fff")}>+ Nieuw lid</button>}
+</div>
+
+{am&&nB&&<div style={{...bx,border:`1px solid ${st.rd}`,padding:10,marginBottom:10}}>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}><span style={{fontSize:11,fontWeight:600}}>Nieuw teamlid</span><button onClick={()=>{sNB(0);sNBf({n:"",r:"bouw",p:"normaal"})}} style={{background:"none",border:"none",color:"#666",cursor:"pointer",fontSize:14}}>✕</button></div>
+<input value={nBf.n} onChange={e=>sNBf({...nBf,n:e.target.value})} placeholder="Naam" style={{width:"100%",background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:6,color:"#fff",fontSize:11,marginBottom:6,boxSizing:"border-box"}}/>
+<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:8}}>
+<select value={nBf.r} onChange={e=>sNBf({...nBf,r:e.target.value})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:6,color:"#fff",fontSize:11}}>
+<option value="bouw">Bouw</option><option value="decoratie">Decoratie</option><option value="techniek">Techniek</option><option value="kleding">Kleding</option><option value="grime">Grime</option><option value="marketing">Marketing</option><option value="algemeen">Algemeen</option>
+</select>
+<select value={nBf.p} onChange={e=>sNBf({...nBf,p:e.target.value})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:6,color:"#fff",fontSize:11}}>
+<option value="normaal">Normaal gebruiker</option><option value="admin">Admin</option>
+</select>
+</div>
+<button onClick={()=>{const naam=(nBf.n||"").trim();if(!naam){alert("Vul een naam in");return}const newId="b"+Date.now();const newMember={id:newId,n:naam,r:nBf.r,p:nBf.p==="admin"?"admin":nBf.r};uDBs([...DBs,newMember]);sNB(0);sNBf({n:"",r:"bouw",p:"normaal"})}} style={{...btn(st.gn,"#fff"),width:"100%"}}>Toevoegen</button>
+</div>}
+
 <div style={{display:"grid",gridTemplateColumns:isDesktop?"1fr 1fr":"1fr",gap:isDesktop?10:6}}>
 {teamList.map(renderPerson)}
 </div>
-{am&&<div style={{marginTop:isDesktop?20:10,padding:isDesktop?10:8,background:"#0f0f0f",border:"1px solid #222",borderRadius:6,fontSize:isDesktop?10:9,color:"#555"}}>ℹ Admins kunnen taken aanmaken, mijlpalen beheren en andere admins aanwijzen. Wijzigingen worden zichtbaar zodra de betreffende persoon opnieuw inlogt.</div>}
+{am&&<div style={{marginTop:isDesktop?20:10,padding:isDesktop?10:8,background:"#0f0f0f",border:"1px solid #222",borderRadius:6,fontSize:isDesktop?10:9,color:"#555"}}>ℹ Admins kunnen taken aanmaken, mijlpalen beheren, teamleden toevoegen en andere admins aanwijzen.</div>}
 </>)}
+
+
 // HOME
 const tt=T.length,dn=T.filter(t=>t.s==="completed").length,ip=T.filter(t=>t.s==="in_progress").length,od=T.filter(t=>t.s!=="completed"&&t.dl&&t.dl<TD).length,tp=tt?Math.round(dn/tt*100):0;
 const roomsForHouse=qaF.h?R.filter(r=>r.h===qaF.h):[];
