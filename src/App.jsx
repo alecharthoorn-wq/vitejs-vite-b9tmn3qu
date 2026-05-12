@@ -134,25 +134,83 @@ style={{background:"none",border:"none",marginTop:1,cursor:ed?"pointer":"default
 
 // ROOM
 if(cR){const rm=cR,ho=DH.find(x=>x.id===rm.h),rt=T.filter(t=>t.r===rm.id),pr=rP(rm.id,T);
-return wrap(<>
-<button onClick={()=>sCR(null)} style={{background:"none",border:"none",color:"#666",fontSize:11,cursor:"pointer",padding:0,marginBottom:6}}>← Terug</button>
-<div style={{fontSize:9,color:st.rd,fontWeight:700,letterSpacing:2,textTransform:"uppercase"}}>{ho?.n}·K{rm.o}</div>
-<h1 style={{fontSize:17,fontWeight:700,margin:"2px 0 6px"}}>{rm.n}</h1>
-<div style={{height:4,background:"#222",borderRadius:2,marginBottom:10,overflow:"hidden"}}><div style={{height:"100%",background:st.rd,width:`${pr}%`}}/></div>
-<div style={{display:"flex",gap:4,flexWrap:"wrap",marginBottom:8}}>{rm.cr.map(id=>{const b=DB.find(x=>x.id===id);return b?<span key={id} style={{fontSize:10,padding:"2px 6px",background:"#1a1a1a",borderRadius:4,color:"#888"}}>{b.n}</span>:null})}</div>
-{rm.nt&&<div style={{marginBottom:8,padding:6,background:"#1a1500",border:"1px solid #433",borderRadius:6,fontSize:10,color:"#ca8a04"}}>⚠ {rm.nt}</div>}
-<div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:9,color:"#444",fontWeight:700,letterSpacing:2,textTransform:"uppercase"}}>Materialen</span>
-{am&&<button onClick={()=>{const n=R.map(x=>x.id===rm.id?{...x,mt:[...x.mt,{n:"",q:1,s:"nodig"}]}:x);uR(n);sCR({...rm,mt:[...rm.mt,{n:"",q:1,s:"nodig"}]})}} style={{background:"none",border:"none",color:st.rd,cursor:"pointer",fontSize:12}}>+</button>}</div>
-{(rm.mt||[]).map((m,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:4,...bx,padding:5}}>
-<span style={{fontSize:11,flex:1,color:"#aaa"}}>{m.n||"—"}</span><span style={{fontSize:9,color:"#555"}}>×{m.q}</span>
-<span style={{fontSize:9,color:m.s==="aanwezig"?"#4ade80":m.s==="besteld"?"#facc15":"#f87171"}}>{m.s}</span></div>)}
-<div style={{display:"flex",justifyContent:"space-between",marginBottom:3,marginTop:8}}><span style={{fontSize:9,color:"#444",fontWeight:700,letterSpacing:2,textTransform:"uppercase"}}>Taken({rt.length})</span>
-{am&&<button onClick={()=>uT([...T,{id:"t"+Date.now(),r:rm.id,h:rm.h,ti:"Nieuwe taak",s:"not_started",pr:"medium",c:"overig",w:"",dl:"",nt:"",tp:"nodig",sb:[]}])} style={btn(st.rd,"#fff")}>+ Taak</button>}</div>
-{rt.filter(t=>t.tp==="nodig").length>0&&<div style={{fontSize:8,color:"#f87171",fontWeight:700,marginBottom:2}}>NODIG</div>}
-{rt.filter(t=>t.tp==="nodig").map(t=><Tk key={t.id} t={t}/>)}
-{rt.filter(t=>t.tp==="nice").length>0&&<div style={{fontSize:8,color:"#60a5fa",fontWeight:700,marginBottom:2,marginTop:4}}>NICE TO HAVE</div>}
-{rt.filter(t=>t.tp==="nice").map(t=><Tk key={t.id} t={t}/>)}
-</>)}
+  const tasksNodig=rt.filter(t=>t.tp==="nodig");
+  const tasksNice=rt.filter(t=>t.tp==="nice");
+  
+  const backBtn=<button onClick={()=>sCR(null)} style={{background:"none",border:"none",color:"#666",fontSize:11,cursor:"pointer",padding:0,marginBottom:6}}>← Terug</button>;
+  
+  const roomHeader=<>
+  <div style={{fontSize:9,color:st.rd,fontWeight:700,letterSpacing:2,textTransform:"uppercase"}}>{ho?.n} · Kamer {rm.o}</div>
+  <h1 style={{fontSize:isDesktop?22:17,fontWeight:700,margin:"2px 0 6px"}}>{rm.n}</h1>
+  <div style={{height:5,background:"#222",borderRadius:2,marginBottom:isDesktop?14:10,overflow:"hidden"}}><div style={{height:"100%",background:st.rd,width:`${pr}%`}}/></div>
+  </>;
+  
+  const roomTeamBlock=<div>
+  <div style={{fontSize:9,color:"#444",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>Bouwers ({rm.cr.length})</div>
+  {rm.cr.length===0?<div style={{...bx,fontSize:10,color:"#444",textAlign:"center",padding:8}}>Geen bouwers toegewezen</div>
+  :<div style={{display:"flex",flexWrap:"wrap",gap:5}}>{rm.cr.map(id=>{const b=DBs.find(x=>x.id===id);return b?<div key={id} style={{display:"flex",alignItems:"center",gap:5,padding:"4px 8px",background:"#1a1a1a",borderRadius:6,fontSize:10,color:"#aaa"}}><div style={{width:18,height:18,borderRadius:"50%",background:"#222",display:"flex",alignItems:"center",justifyContent:"center",fontSize:9,fontWeight:700,color:"#888"}}>{b.n[0]}</div>{b.n}</div>:null})}</div>}
+  </div>;
+  
+  const roomNote=rm.nt&&<div style={{padding:8,background:"#1a1500",border:"1px solid #433",borderRadius:6,fontSize:11,color:"#ca8a04"}}>⚠ {rm.nt}</div>;
+  
+  const materialsBlock=<div>
+  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}>
+  <span style={{fontSize:9,color:"#444",fontWeight:700,letterSpacing:2,textTransform:"uppercase"}}>Materialen ({(rm.mt||[]).length})</span>
+  {am&&<button onClick={()=>{const n=R.map(x=>x.id===rm.id?{...x,mt:[...x.mt,{n:"",q:1,s:"nodig"}]}:x);uR(n);sCR({...rm,mt:[...rm.mt,{n:"",q:1,s:"nodig"}]})}} style={{background:"none",border:"none",color:st.rd,cursor:"pointer",fontSize:14,fontWeight:700}}>+</button>}
+  </div>
+  {(rm.mt||[]).length===0?<div style={{...bx,fontSize:10,color:"#444",textAlign:"center",padding:8}}>Geen materialen</div>
+  :(rm.mt||[]).map((m,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:6,...bx,padding:7,marginBottom:4}}>
+  <span style={{fontSize:11,flex:1,color:"#aaa"}}>{m.n||"—"}</span>
+  <span style={{fontSize:10,color:"#555"}}>×{m.q}</span>
+  <span style={{fontSize:10,padding:"2px 6px",borderRadius:4,background:m.s==="aanwezig"?"#0a1f0a":m.s==="besteld"?"#1a1500":"#1a0505",color:m.s==="aanwezig"?"#4ade80":m.s==="besteld"?"#facc15":"#f87171"}}>{m.s}</span>
+  </div>)}
+  </div>;
+  
+  const addTaskBtn=am&&<button onClick={()=>uT([...T,{id:"t"+Date.now(),r:rm.id,h:rm.h,ti:"Nieuwe taak",s:"not_started",pr:"medium",c:"overig",w:"",dl:"",nt:"",tp:"nodig",sb:[]}])} style={btn(st.rd,"#fff")}>+ Taak toevoegen</button>;
+  
+  const tasksBlock=<div>
+  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+  <span style={{fontSize:9,color:"#444",fontWeight:700,letterSpacing:2,textTransform:"uppercase"}}>Taken ({rt.length})</span>
+  {addTaskBtn}
+  </div>
+  {tasksNodig.length>0&&<><div style={{fontSize:9,color:"#f87171",fontWeight:700,marginBottom:4,marginTop:4}}>NODIG ({tasksNodig.length})</div>
+  {tasksNodig.map(t=><Tk key={t.id} t={t}/>)}</>}
+  {tasksNice.length>0&&<><div style={{fontSize:9,color:"#60a5fa",fontWeight:700,marginBottom:4,marginTop:8}}>NICE TO HAVE ({tasksNice.length})</div>
+  {tasksNice.map(t=><Tk key={t.id} t={t}/>)}</>}
+  {rt.length===0&&<div style={{...bx,textAlign:"center",color:"#333",fontSize:11,padding:20}}>Nog geen taken voor deze kamer</div>}
+  </div>;
+  
+  if(isDesktop)return wrap(<>
+  {backBtn}
+  {roomHeader}
+  <div style={{display:"grid",gridTemplateColumns:"1.5fr 1fr",gap:20,alignItems:"start"}}>
+  <div>{tasksBlock}</div>
+  <div style={{position:"sticky",top:20,display:"flex",flexDirection:"column",gap:14}}>
+  {roomNote}
+  {roomTeamBlock}
+  {materialsBlock}
+  </div>
+  </div>
+  </>);
+  
+  return wrap(<>
+  {backBtn}
+  {roomHeader}
+  <div style={{display:"flex",gap:4,flexWrap:"wrap",marginBottom:8}}>{rm.cr.map(id=>{const b=DBs.find(x=>x.id===id);return b?<span key={id} style={{fontSize:10,padding:"2px 6px",background:"#1a1a1a",borderRadius:4,color:"#888"}}>{b.n}</span>:null})}</div>
+  {rm.nt&&<div style={{marginBottom:8,padding:6,background:"#1a1500",border:"1px solid #433",borderRadius:6,fontSize:10,color:"#ca8a04"}}>⚠ {rm.nt}</div>}
+  <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:9,color:"#444",fontWeight:700,letterSpacing:2,textTransform:"uppercase"}}>Materialen</span>
+  {am&&<button onClick={()=>{const n=R.map(x=>x.id===rm.id?{...x,mt:[...x.mt,{n:"",q:1,s:"nodig"}]}:x);uR(n);sCR({...rm,mt:[...rm.mt,{n:"",q:1,s:"nodig"}]})}} style={{background:"none",border:"none",color:st.rd,cursor:"pointer",fontSize:12}}>+</button>}</div>
+  {(rm.mt||[]).map((m,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:4,...bx,padding:5}}>
+  <span style={{fontSize:11,flex:1,color:"#aaa"}}>{m.n||"—"}</span><span style={{fontSize:9,color:"#555"}}>×{m.q}</span>
+  <span style={{fontSize:9,color:m.s==="aanwezig"?"#4ade80":m.s==="besteld"?"#facc15":"#f87171"}}>{m.s}</span></div>)}
+  <div style={{display:"flex",justifyContent:"space-between",marginBottom:3,marginTop:8}}><span style={{fontSize:9,color:"#444",fontWeight:700,letterSpacing:2,textTransform:"uppercase"}}>Taken({rt.length})</span>
+  {am&&<button onClick={()=>uT([...T,{id:"t"+Date.now(),r:rm.id,h:rm.h,ti:"Nieuwe taak",s:"not_started",pr:"medium",c:"overig",w:"",dl:"",nt:"",tp:"nodig",sb:[]}])} style={btn(st.rd,"#fff")}>+ Taak</button>}</div>
+  {tasksNodig.length>0&&<div style={{fontSize:8,color:"#f87171",fontWeight:700,marginBottom:2}}>NODIG</div>}
+  {tasksNodig.map(t=><Tk key={t.id} t={t}/>)}
+  {tasksNice.length>0&&<div style={{fontSize:8,color:"#60a5fa",fontWeight:700,marginBottom:2,marginTop:4}}>NICE TO HAVE</div>}
+  {tasksNice.map(t=><Tk key={t.id} t={t}/>)}
+  </>)}
+  
 
 // HOUSE
 if(cH){const h=cH,hr=R.filter(x=>x.h===h.id).sort((a,b)=>a.o-b.o),pr=hP(h.id,T),ht=T.filter(t=>t.h===h.id),dn=ht.filter(t=>t.s==="completed").length,ip=ht.filter(t=>t.s==="in_progress").length;
@@ -229,47 +287,109 @@ return wrap(<>
 <div><div style={{fontSize:12,fontWeight:600}}>{r.n}</div><div style={{fontSize:9,color:"#444"}}>{T.filter(t=>t.r===r.id).length} taken</div></div></div>
 <div style={{display:"flex",alignItems:"center",gap:4}}><div style={{width:30}}><div style={{height:3,background:"#222",borderRadius:2,overflow:"hidden"}}><div style={{height:"100%",background:rp===100?st.gn:st.rd,width:`${rp}%`}}/></div></div><span style={{color:"#333"}}>›</span></div></button>})}
 </>)}
+
 // SEARCH
-if(tb==="search"){const ql=q.toLowerCase();const res=[];
-if(ql){DH.forEach(h=>{if((h.n+h.d+h.l).toLowerCase().includes(ql))res.push({i:"🏚️",l:h.n,s:h.d,a:()=>sCH(h)})});
-R.forEach(r=>{const h=DH.find(x=>x.id===r.h);if((r.n+(r.nt||"")).toLowerCase().includes(ql))res.push({i:"🚪",l:r.n,s:h?.n,a:()=>{sCH(h);sCR(r)}})});
-T.forEach(t=>{const r=R.find(x=>x.id===t.r),h=DH.find(x=>x.id===t.h);if((t.ti+t.c+(t.nt||"")).toLowerCase().includes(ql))res.push({i:"📋",l:t.ti,s:`${h?.n}→${r?.n}`,a:()=>{sCH(h);sCR(r)}})});
-R.forEach(r=>{(r.mt||[]).forEach(m=>{if(m.n.toLowerCase().includes(ql)){const h=DH.find(x=>x.id===r.h);res.push({i:"📦",l:m.n,s:`${h?.n}→${r.n}`,a:()=>{sCH(h);sCR(r)}})}})});
-DB.forEach(b=>{if((b.n+b.r).toLowerCase().includes(ql))res.push({i:"👤",l:b.n,s:b.r,a:()=>sTb("team")})})}
+if(tb==="search"){const qry=(q||"").toLowerCase().trim();
+const rs=!qry?[]:[...DH.filter(h=>h.n.toLowerCase().includes(qry)||h.l.toLowerCase().includes(qry)).map(h=>({tp:"huis",d:h,i:"🏠",l:h.l,c:"#3b82f6"})),
+...R.filter(r=>r.n.toLowerCase().includes(qry)||(r.nt||"").toLowerCase().includes(qry)).map(r=>{const h=DH.find(x=>x.id===r.h);return{tp:"kamer",d:r,i:"🚪",l:h?.n,c:"#a855f7",h}}),
+...T.filter(t=>t.ti.toLowerCase().includes(qry)||(t.nt||"").toLowerCase().includes(qry)||(t.sb||[]).some(s=>(s.t||"").toLowerCase().includes(qry))).map(t=>{const r=R.find(x=>x.id===t.r),h=DH.find(x=>x.id===t.h);return{tp:"taak",d:t,i:t.s==="completed"?"✅":t.s==="in_progress"?"🔄":"⭕",l:`${h?.n}→${r?.n}`,c:t.s==="completed"?"#4ade80":"#facc15",r,h}}),
+...DBs.filter(b=>b.n.toLowerCase().includes(qry)||b.r.toLowerCase().includes(qry)).map(b=>({tp:"persoon",d:b,i:"👤",l:b.r,c:"#fb923c"}))];
+
 return wrap(<>
-<h1 style={{fontSize:17,fontWeight:700,marginBottom:8}}>🔍 Zoeken</h1>
-<input value={q} onChange={e=>sQ(e.target.value)} placeholder="Huis, kamer, taak, materiaal, persoon..." style={{width:"100%",background:"#111",border:"1px solid #333",borderRadius:8,padding:"8px 10px",color:"#fff",fontSize:12,marginBottom:8,boxSizing:"border-box",outline:"none"}} autoFocus/>
-{!ql&&<div style={{textAlign:"center",color:"#333",fontSize:10,padding:20}}>Typ om te zoeken</div>}
-{ql&&!res.length&&<div style={{textAlign:"center",color:"#444",fontSize:10,padding:20}}>Geen resultaten</div>}
-{res.map((r,i)=><button key={i} onClick={()=>{r.a();sQ("")}} style={{width:"100%",...bx,cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:6,color:"#fff"}}>
-<span>{r.i}</span><div style={{flex:1}}><div style={{fontSize:12,fontWeight:600}}>{r.l}</div><div style={{fontSize:9,color:"#444"}}>{r.s}</div></div></button>)}
+<h1 style={{fontSize:isDesktop?22:17,fontWeight:700,marginBottom:isDesktop?14:8}}>🔍 Zoeken</h1>
+<input value={q} onChange={e=>sQ(e.target.value)} autoFocus placeholder="Zoek huizen, kamers, taken, personen…" style={{width:"100%",background:"#1a1a1a",border:"1px solid #333",borderRadius:8,padding:isDesktop?"12px 14px":"8px 10px",color:"#fff",fontSize:isDesktop?14:12,marginBottom:isDesktop?14:10,boxSizing:"border-box"}}/>
+{!qry?<div style={{...bx,textAlign:"center",color:"#333",fontSize:11,padding:isDesktop?40:20}}>Typ iets om te zoeken</div>
+:rs.length===0?<div style={{...bx,textAlign:"center",color:"#333",fontSize:11,padding:isDesktop?40:20}}>Geen resultaten voor "{q}"</div>
+:<>
+<div style={{fontSize:10,color:"#444",marginBottom:6}}>{rs.length} resultaten</div>
+<div style={{display:"grid",gridTemplateColumns:isDesktop?"1fr 1fr":"1fr",gap:isDesktop?8:4}}>
+{rs.map((r,i)=><button key={i} onClick={()=>{if(r.tp==="huis"){sCH(r.d);sTb("home")}else if(r.tp==="kamer"){sCH(r.h);sCR(r.d);sTb("home")}else if(r.tp==="taak"){sCH(r.h);sCR(r.r);sTb("home")}else{sTb("team")}}} style={{...bx,cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:8,color:"#fff",padding:isDesktop?10:7}}>
+<span style={{fontSize:isDesktop?18:14}}>{r.i}</span>
+<div style={{flex:1,minWidth:0}}>
+<div style={{fontSize:isDesktop?12:11,fontWeight:600}}>{r.d.n||r.d.ti}</div>
+<div style={{fontSize:isDesktop?10:9,color:"#444",display:"flex",gap:5,alignItems:"center"}}>
+<span style={{padding:"1px 5px",borderRadius:3,background:"#1a1a1a",color:r.c,fontSize:8,textTransform:"uppercase",fontWeight:700}}>{r.tp}</span>
+<span>{r.l}</span>
+</div>
+</div>
+<span style={{color:"#333"}}>›</span>
+</button>)}
+</div>
+</>}
 </>)}
 
 // DAGSTART
 if(tb==="dag"){const dtT=T.filter(t=>dT.includes(t.id)),up=T.filter(t=>t.s!=="completed"&&t.dl&&t.dl<=TD&&!dT.includes(t.id)),od=T.filter(t=>t.s!=="completed"&&t.dl&&t.dl<TD);
+const dagStartNodig=dtT.filter(t=>t.tp==="nodig");
+const dagStartNice=dtT.filter(t=>t.tp==="nice");
+
+const dagHeader=<>
+<h1 style={{fontSize:isDesktop?22:17,fontWeight:700,margin:0}}>☀️ Dagstart</h1>
+<p style={{fontSize:isDesktop?12:10,color:"#444",marginBottom:isDesktop?14:8,marginTop:4}}>{new Date().toLocaleDateString("nl-NL",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</p>
+</>;
+
+const presentBlock=<div>
+<div style={{fontSize:9,color:"#444",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>Aanwezig ({dB.length})</div>
+<div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:isDesktop?14:10}}>{DBs.filter(b=>b.id!=="b0").map(b=>{const s=dB.includes(b.id);return<button key={b.id} onClick={()=>{if(!am)return;const n=s?dB.filter(x=>x!==b.id):[...dB,b.id];sDB(n);S("zd",{b:n,t:dT})}} style={{padding:"4px 10px",borderRadius:14,border:`1px solid ${s?"#166534":"#222"}`,background:s?"#0a1f0a":"#111",color:s?"#4ade80":"#444",fontSize:10,cursor:am?"pointer":"default"}}>{b.n}</button>})}</div>
+</div>;
+
+const addToTodayBlock=am&&up.length>0&&<div>
+<div style={{fontSize:9,color:"#444",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>Toevoegen aan vandaag ({up.length})</div>
+{up.slice(0,isDesktop?8:5).map(t=>{const r=R.find(x=>x.id===t.r),h=DH.find(x=>x.id===t.h);return<button key={t.id} onClick={()=>{const n=[...dT,t.id];sDT(n);S("zd",{b:dB,t:n})}} style={{width:"100%",...bx,cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:6,color:"#fff",padding:7}}>
+<span style={{color:st.rd,fontSize:14,fontWeight:700}}>+</span>
+<div style={{flex:1}}><div style={{fontSize:11,fontWeight:500}}>{t.ti}</div><div style={{fontSize:9,color:"#444"}}>{h?.n}→{r?.n}</div></div>
+<span style={{fontSize:9,padding:"2px 6px",borderRadius:4,background:t.tp==="nodig"?"#1a0505":"#05051a",color:t.tp==="nodig"?"#f87171":"#60a5fa"}}>{t.tp}</span>
+</button>})}
+</div>;
+
+const todayBlock=<div>
+<div style={{fontSize:9,color:"#444",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>Vandaag op de planning ({dtT.length})</div>
+{!dtT.length?<div style={{...bx,textAlign:"center",color:"#333",fontSize:11,padding:isDesktop?20:12}}>Geen taken voor vandaag{am&&<><br/><span style={{fontSize:9}}>Voeg taken toe via de lijst hiernaast</span></>}</div>
+:<>
+{dagStartNodig.length>0&&<div style={{fontSize:9,color:"#f87171",fontWeight:700,marginBottom:4}}>NODIG ({dagStartNodig.length})</div>}
+{dagStartNodig.map(t=><Tk key={t.id} t={t} sr={1}/>)}
+{dagStartNice.length>0&&<div style={{fontSize:9,color:"#60a5fa",fontWeight:700,marginBottom:4,marginTop:8}}>NICE TO HAVE ({dagStartNice.length})</div>}
+{dagStartNice.map(t=><Tk key={t.id} t={t} sr={1}/>)}
+</>}
+</div>;
+
+const overdueBlock=od.length>0&&<div>
+<div style={{fontSize:9,color:"#ef4444",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>⚠ Achterstand ({od.length})</div>
+{od.slice(0,isDesktop?8:4).map(t=>{const r=R.find(x=>x.id===t.r),h=DH.find(x=>x.id===t.h);return<div key={t.id} onClick={()=>{sCH(h);sCR(r)}} style={{background:"#1a0505",border:"1px solid #7f1d1d",borderRadius:6,padding:6,marginBottom:3,cursor:"pointer"}}>
+<div style={{fontSize:10,color:"#fca5a5",fontWeight:500}}>{t.ti}</div>
+<div style={{display:"flex",justifyContent:"space-between",fontSize:9,color:"#ef4444",marginTop:2}}><span>{h?.n}→{r?.n}</span><span>{t.dl}</span></div>
+</div>})}
+</div>;
+
+if(isDesktop)return wrap(<>
+{dagHeader}
+{presentBlock}
+<div style={{display:"grid",gridTemplateColumns:am?"1.5fr 1fr":"1fr",gap:20,alignItems:"start"}}>
+<div>{todayBlock}</div>
+{am&&<div style={{position:"sticky",top:20,display:"flex",flexDirection:"column",gap:14}}>
+{addToTodayBlock}
+{overdueBlock}
+</div>}
+{!am&&overdueBlock&&<div style={{marginTop:14}}>{overdueBlock}</div>}
+</div>
+</>);
+
 return wrap(<>
-<h1 style={{fontSize:17,fontWeight:700}}>☀️ Dagstart</h1><p style={{fontSize:10,color:"#444",marginBottom:8}}>{new Date().toLocaleDateString("nl-NL",{weekday:"long",day:"numeric",month:"long"})}</p>
-<div style={{fontSize:8,color:"#444",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:3}}>Aanwezig({dB.length})</div>
-<div style={{display:"flex",flexWrap:"wrap",gap:3,marginBottom:10}}>{DB.filter(b=>b.id!=="b0").map(b=>{const s=dB.includes(b.id);return<button key={b.id} onClick={()=>{if(!am)return;const n=s?dB.filter(x=>x!==b.id):[...dB,b.id];sDB(n);S("zd",{b:n,t:dT})}} style={{padding:"3px 8px",borderRadius:12,border:`1px solid ${s?"#166534":"#222"}`,background:s?"#0a1f0a":"#111",color:s?"#4ade80":"#444",fontSize:9,cursor:am?"pointer":"default"}}>{b.n}</button>})}</div>
-{am&&up.length>0&&<><div style={{fontSize:8,color:"#444",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:3}}>Toevoegen</div>
-{up.slice(0,5).map(t=>{const r=R.find(x=>x.id===t.r),h=DH.find(x=>x.id===t.h);return<button key={t.id} onClick={()=>{const n=[...dT,t.id];sDT(n);S("zd",{b:dB,t:n})}} style={{width:"100%",...bx,cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:5,color:"#fff"}}>
-<span style={{color:st.rd}}>+</span><div style={{flex:1}}><div style={{fontSize:11}}>{t.ti}</div><div style={{fontSize:9,color:"#444"}}>{h?.n}→{r?.n}</div></div><span style={{fontSize:8,color:t.tp==="nodig"?"#f87171":"#60a5fa"}}>{t.tp}</span></button>})}<div style={{marginBottom:8}}/></>}
-<div style={{fontSize:8,color:"#444",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:3}}>Vandaag({dtT.length})</div>
-{!dtT.length&&<div style={{...bx,textAlign:"center",color:"#333",fontSize:10}}>Geen taken</div>}
-{dtT.filter(t=>t.tp==="nodig").map(t=><Tk key={t.id} t={t} sr={1}/>)}
-{dtT.filter(t=>t.tp==="nice").map(t=><Tk key={t.id} t={t} sr={1}/>)}
-{od.length>0&&<div style={{marginTop:8}}><div style={{fontSize:8,color:"#ef4444",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:3}}>⚠Achterstand({od.length})</div>
-{od.slice(0,4).map(t=><div key={t.id} style={{background:"#1a0505",border:"1px solid #7f1d1d",borderRadius:6,padding:5,marginBottom:3,display:"flex",justifyContent:"space-between"}}><span style={{fontSize:10,color:"#fca5a5"}}>{t.ti}</span><span style={{fontSize:9,color:"#ef4444"}}>{t.dl}</span></div>)}</div>}
+{dagHeader}
+{presentBlock}
+{addToTodayBlock&&<div style={{marginBottom:10}}>{addToTodayBlock}</div>}
+{todayBlock}
+{overdueBlock&&<div style={{marginTop:10}}>{overdueBlock}</div>}
 </>)}
 // MIJLPALEN
 if(tb==="mile"){const today=new Date(TD);const sorted=[...M].sort((a,b)=>a.dl.localeCompare(b.dl));
   const mStatus=m=>{if(m.d)return{c:"#16a34a",l:"Gehaald",bg:"#0a1f0a",bd:"#166534"};const dd=new Date(m.dl);const diff=Math.ceil((dd-today)/(1000*60*60*24));if(diff<0)return{c:"#ef4444",l:"Gemist",bg:"#1a0505",bd:"#7f1d1d"};if(diff<=7)return{c:"#ef4444",l:`${diff}d`,bg:"#1a0505",bd:"#7f1d1d"};if(diff<=14)return{c:"#facc15",l:`${diff}d`,bg:"#1a1500",bd:"#854d0e"};return{c:"#888",l:`${diff}d`,bg:"#0f0f0f",bd:"#222"}};
   return wrap(<>
   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-  <h1 style={{fontSize:17,fontWeight:700,margin:0}}>🎯 Mijlpalen</h1>
+  <h1 style={{fontSize:isDesktop?22:17,fontWeight:700,margin:0}}>🎯 Mijlpalen</h1>
   {am&&<button onClick={()=>sNM(1)} style={btn(st.rd,"#fff")}>+ Nieuwe</button>}
   </div>
-  <p style={{fontSize:10,color:"#444",marginBottom:10}}>{sorted.length} mijlpalen · {sorted.filter(m=>!m.d).length} open</p>
+  <p style={{fontSize:isDesktop?12:10,color:"#444",marginBottom:isDesktop?14:10}}>{sorted.length} mijlpalen · {sorted.filter(m=>!m.d).length} open</p>
   
   {nM&&<div style={{...bx,border:`1px solid ${st.rd}`,padding:10,marginBottom:10}}>
   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}><span style={{fontSize:11,fontWeight:600}}>Nieuwe mijlpaal</span><button onClick={()=>{sNM(0);sEMf({})}} style={{background:"none",border:"none",color:"#666",cursor:"pointer",fontSize:14}}>✕</button></div>
@@ -279,7 +399,7 @@ if(tb==="mile"){const today=new Date(TD);const sorted=[...M].sort((a,b)=>a.dl.lo
   <button onClick={()=>{if(!eMf.n||!eMf.dl)return;uM([...M,{id:"m"+Date.now(),n:eMf.n,dl:eMf.dl,d:0,nt:eMf.nt||""}]);sNM(0);sEMf({})}} disabled={!eMf.n||!eMf.dl} style={{...btn(st.gn,"#fff"),width:"100%",opacity:eMf.n&&eMf.dl?1:.5}}>Toevoegen</button>
   </div>}
   
-  {isDesktop&&sorted.length>0&&<div style={{...bx,padding:14,marginBottom:12,overflowX:"auto"}}>
+  {isDesktop&&sorted.length>0&&<div style={{...bx,padding:14,marginBottom:14,overflowX:"auto"}}>
   <div style={{display:"flex",alignItems:"flex-start",gap:0,minWidth:"100%",position:"relative",paddingTop:30,paddingBottom:6}}>
   <div style={{position:"absolute",top:38,left:20,right:20,height:2,background:"#333"}}/>
   {sorted.map((m,i)=>{const s=mStatus(m);return<div key={m.id} style={{flex:1,minWidth:90,display:"flex",flexDirection:"column",alignItems:"center",position:"relative",zIndex:1}}>
@@ -291,6 +411,7 @@ if(tb==="mile"){const today=new Date(TD);const sorted=[...M].sort((a,b)=>a.dl.lo
   </div>
   </div>}
   
+  <div style={{display:"grid",gridTemplateColumns:isDesktop?"1fr 1fr":"1fr",gap:isDesktop?10:6}}>
   {sorted.map(m=>{const s=mStatus(m);if(eM===m.id)return<div key={m.id} style={{...bx,border:`1px solid ${st.rd}`,padding:10}}>
   <input value={eMf.n||""} onChange={e=>sEMf({...eMf,n:e.target.value})} style={{width:"100%",background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11,marginBottom:5,boxSizing:"border-box"}}/>
   <input type="date" value={eMf.dl||""} onChange={e=>sEMf({...eMf,dl:e.target.value})} style={{width:"100%",background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11,marginBottom:5,boxSizing:"border-box"}}/>
@@ -314,22 +435,28 @@ if(tb==="mile"){const today=new Date(TD);const sorted=[...M].sort((a,b)=>a.dl.lo
   </div>}
   </div>
   </div>})}
+  </div>
   {sorted.length===0&&<div style={{...bx,textAlign:"center",color:"#333",fontSize:11,padding:20}}>Nog geen mijlpalen{am&&<><br/><span style={{fontSize:9}}>Klik op "+ Nieuwe" om er een toe te voegen</span></>}</div>}
   </>)}
-// TEAM
-if(tb==="team")return wrap(<>
-  <h1 style={{fontSize:17,fontWeight:700,marginBottom:8}}>👥 Team</h1>
-  {DBs.filter(b=>b.id!=="b0").map(b=>{const d=T.filter(t=>t.w===b.id&&t.s==="completed").length,ip=T.filter(t=>t.w===b.id&&t.s==="in_progress").length;const isMe=U?.id===b.id;const isAdminB=b.p==="admin";
-  return<div key={b.id} style={{...bx,display:"flex",alignItems:"center",justifyContent:"space-between",gap:6}}>
-  <div style={{display:"flex",alignItems:"center",gap:6,flex:1,minWidth:0}}><div style={{width:28,height:28,borderRadius:"50%",background:"#1a1a1a",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontSize:11,color:"#555",flexShrink:0}}>{b.n[0]}</div>
-  <div style={{minWidth:0}}><div style={{fontSize:12,fontWeight:600}}>{b.n}{isMe&&<span style={{fontSize:9,color:"#666",marginLeft:4}}>(jij)</span>}</div><div style={{fontSize:9,color:"#444"}}>{b.r}</div></div>
-  </div>
-  <span style={{fontSize:10,whiteSpace:"nowrap"}}><span style={{color:"#4ade80"}}>{d}✓</span> <span style={{color:"#facc15"}}>{ip}⏳</span></span>
-  {am&&<button onClick={()=>{if(isMe){alert("Je kunt je eigen admin-rechten niet aanpassen.");return}const newP=isAdminB?b.r:"admin";uDBs(DBs.map(x=>x.id===b.id?{...x,p:newP}:x))}} disabled={isMe} style={{padding:"3px 7px",borderRadius:4,border:`1px solid ${isAdminB?"#7f1d1d":"#333"}`,background:isAdminB?"#1a0505":"#111",color:isAdminB?"#fca5a5":"#666",fontSize:9,cursor:isMe?"not-allowed":"pointer",opacity:isMe?.4:1,whiteSpace:"nowrap"}} title={isMe?"Je kunt jezelf niet de-adminnen":isAdminB?"Klik om admin-rechten in te trekken":"Klik om admin te maken"}>{isAdminB?"Admin ✓":"Maak admin"}</button>}
-  </div>})}
-  {am&&<div style={{marginTop:10,padding:8,background:"#0f0f0f",border:"1px solid #222",borderRadius:6,fontSize:9,color:"#555"}}>ℹ Admins kunnen taken aanmaken, mijlpalen beheren en andere admins aanwijzen. Wijzigingen worden zichtbaar zodra de betreffende persoon opnieuw inlogt.</div>}
-  </>);
 
+// TEAM
+if(tb==="team"){const teamList=DBs.filter(b=>b.id!=="b0");
+const renderPerson=b=>{const d=T.filter(t=>t.w===b.id&&t.s==="completed").length,ip=T.filter(t=>t.w===b.id&&t.s==="in_progress").length;const isMe=U?.id===b.id;const isAdminB=b.p==="admin";
+return<div key={b.id} style={{...bx,display:"flex",alignItems:"center",justifyContent:"space-between",gap:6,padding:isDesktop?12:8}}>
+<div style={{display:"flex",alignItems:"center",gap:isDesktop?10:6,flex:1,minWidth:0}}><div style={{width:isDesktop?38:28,height:isDesktop?38:28,borderRadius:"50%",background:"#1a1a1a",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontSize:isDesktop?14:11,color:"#555",flexShrink:0}}>{b.n[0]}</div>
+<div style={{minWidth:0}}><div style={{fontSize:isDesktop?13:12,fontWeight:600}}>{b.n}{isMe&&<span style={{fontSize:9,color:"#666",marginLeft:4}}>(jij)</span>}</div><div style={{fontSize:isDesktop?11:9,color:"#444"}}>{b.r}</div></div>
+</div>
+<span style={{fontSize:isDesktop?11:10,whiteSpace:"nowrap"}}><span style={{color:"#4ade80"}}>{d}✓</span> <span style={{color:"#facc15"}}>{ip}⏳</span></span>
+{am&&<button onClick={()=>{if(isMe){alert("Je kunt je eigen admin-rechten niet aanpassen.");return}const newP=isAdminB?b.r:"admin";uDBs(DBs.map(x=>x.id===b.id?{...x,p:newP}:x))}} disabled={isMe} style={{padding:"3px 7px",borderRadius:4,border:`1px solid ${isAdminB?"#7f1d1d":"#333"}`,background:isAdminB?"#1a0505":"#111",color:isAdminB?"#fca5a5":"#666",fontSize:9,cursor:isMe?"not-allowed":"pointer",opacity:isMe?.4:1,whiteSpace:"nowrap"}} title={isMe?"Je kunt jezelf niet de-adminnen":isAdminB?"Klik om admin-rechten in te trekken":"Klik om admin te maken"}>{isAdminB?"Admin ✓":"Maak admin"}</button>}
+</div>};
+
+return wrap(<>
+<h1 style={{fontSize:isDesktop?22:17,fontWeight:700,marginBottom:isDesktop?14:8}}>👥 Team ({teamList.length})</h1>
+<div style={{display:"grid",gridTemplateColumns:isDesktop?"1fr 1fr":"1fr",gap:isDesktop?10:6}}>
+{teamList.map(renderPerson)}
+</div>
+{am&&<div style={{marginTop:isDesktop?20:10,padding:isDesktop?10:8,background:"#0f0f0f",border:"1px solid #222",borderRadius:6,fontSize:isDesktop?10:9,color:"#555"}}>ℹ Admins kunnen taken aanmaken, mijlpalen beheren en andere admins aanwijzen. Wijzigingen worden zichtbaar zodra de betreffende persoon opnieuw inlogt.</div>}
+</>)}
 // HOME
 const tt=T.length,dn=T.filter(t=>t.s==="completed").length,ip=T.filter(t=>t.s==="in_progress").length,od=T.filter(t=>t.s!=="completed"&&t.dl&&t.dl<TD).length,tp=tt?Math.round(dn/tt*100):0;
 const roomsForHouse=qaF.h?R.filter(r=>r.h===qaF.h):[];
