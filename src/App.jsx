@@ -246,4 +246,3 @@ return<div key={t.id} onClick={()=>{sCH(h);sCR(r)}} style={{...bx,cursor:"pointe
 </div>}
 </>);
 }
-}
