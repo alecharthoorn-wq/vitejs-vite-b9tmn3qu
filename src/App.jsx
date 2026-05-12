@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 const DB=[{id:"b1",n:"Ron",r:"bouw",p:"admin"},{id:"b2",n:"Remco",r:"bouw",p:"bouw"},{id:"b3",n:"Sim",r:"deco",p:"decoratie"},{id:"b4",n:"Ricardo",r:"bouw",p:"bouw"},{id:"b5",n:"Koen L",r:"techniek",p:"techniek"},{id:"b6",n:"Jeroen",r:"techniek",p:"techniek"},{id:"b7",n:"Sanna",r:"deco",p:"decoratie"},{id:"b8",n:"Bart",r:"ict",p:"admin"},{id:"b0",n:"Alec",r:"admin",p:"admin"}];
 const DH=[{id:"h1",n:"Hail Mary Hospital",d:"Update in loods",l:"loods",ld:"b1",dl:"2026-11-01"},{id:"h2",n:"Huckabay Highstreet",d:"Update in loods",l:"loods",ld:"b4",dl:"2026-11-01"},{id:"h3",n:"The Barn",d:"Nieuw in tent",l:"tent",ld:"b1",dl:"2026-11-08"},{id:"h4",n:"The Mine",d:"Nieuw in tent",l:"tent",ld:"b4",dl:"2026-11-08"},{id:"h5",n:"The Woods",d:"Bosroute",l:"bos",ld:"b3",dl:"2026-11-08"}];
 const iR=[{id:"r1",h:"h1",n:"Receptie",o:1,cr:["b4","b7"],nt:"",mt:[{n:"Balie",q:1,s:"aanwezig"}]},{id:"r2",h:"h1",n:"Operatiekamer",o:2,cr:["b5"],nt:"Animatronic testen",mt:[{n:"Nep bloed",q:2,s:"nodig"}]},{id:"r3",h:"h1",n:"Gang C",o:3,cr:[],nt:"",mt:[]},{id:"r4",h:"h2",n:"Hoofdstraat",o:1,cr:["b2","b3"],nt:"Gevels updaten",mt:[{n:"Geveldelen",q:6,s:"aanwezig"},{n:"Verf",q:3,s:"besteld"}]},{id:"r5",h:"h2",n:"Slagerij",o:2,cr:["b3"],nt:"",mt:[{n:"Vleeshaken",q:8,s:"nodig"}]},{id:"r6",h:"h3",n:"TBD",o:1,cr:[],nt:"Plattegrond volgt",mt:[]},{id:"r7",h:"h4",n:"TBD",o:1,cr:[],nt:"Plattegrond volgt",mt:[]},{id:"r8",h:"h5",n:"Startpunt",o:1,cr:["b3"],nt:"Demontabel!",mt:[{n:"Balken",q:6,s:"aanwezig"}]},{id:"r9",h:"h5",n:"Open Plek",o:2,cr:[],nt:"Brandveiligheid!",mt:[{n:"LED kaarsen",q:20,s:"nodig"}]}];
+const iM=[{id:"m1",n:"Plattegronden definitief",dl:"2026-05-15",d:1,nt:""},{id:"m2",n:"Hail Mary Hospital concept goedgekeurd",dl:"2026-06-01",d:0,nt:""},{id:"m3",n:"Loods-huizen klaar",dl:"2026-07-01",d:0,nt:""},{id:"m4",n:"Boshuisjes (demontabel) klaar",dl:"2026-08-01",d:0,nt:""},{id:"m5",n:"Tenten geplaatst, bouw begonnen",dl:"2026-08-15",d:0,nt:""},{id:"m6",n:"Tentenhuizen ruwbouw klaar",dl:"2026-10-01",d:0,nt:""},{id:"m7",n:"Decoratie klaar",dl:"2026-10-20",d:0,nt:""},{id:"m8",n:"Brandinspectie",dl:"2026-10-25",d:0,nt:"Niets meer aanpassen na deze dag"},{id:"m9",n:"Generale repetitie",dl:"2026-10-28",d:0,nt:""},{id:"m10",n:"Openingsdag",dl:"2026-10-31",d:0,nt:""}];
 const iT=[{id:"t1",r:"r1",h:"h1",ti:"Balie herstellen",s:"in_progress",pr:"high",c:"ruwbouw",w:"b4",dl:"2026-08-15",nt:"",tp:"nodig",sb:[{id:"s1",ti:"Demonteren",d:true},{id:"s2",ti:"Hout vervangen",d:false}]},{id:"t2",r:"r1",h:"h1",ti:"Deco wanden",s:"not_started",pr:"medium",c:"decoratie",w:"b7",dl:"2026-09-01",nt:"",tp:"nice",sb:[]},{id:"t3",r:"r2",h:"h1",ti:"Muren check",s:"not_started",pr:"high",c:"ruwbouw",w:"b1",dl:"2026-08-20",nt:"",tp:"nodig",sb:[]},{id:"t4",r:"r2",h:"h1",ti:"Animatronic",s:"not_started",pr:"high",c:"techniek",w:"b5",dl:"2026-09-15",nt:"Testen!",tp:"nodig",sb:[{id:"s3",ti:"Ophalen",d:false},{id:"s4",ti:"Monteren",d:false}]},{id:"t5",r:"r4",h:"h2",ti:"Gevels updaten",s:"in_progress",pr:"high",c:"decoratie",w:"b3",dl:"2026-08-10",nt:"",tp:"nodig",sb:[]},{id:"t6",r:"r4",h:"h2",ti:"Straatverlichting",s:"not_started",pr:"medium",c:"techniek",w:"b6",dl:"2026-09-20",nt:"",tp:"nice",sb:[]},{id:"t7",r:"r5",h:"h2",ti:"Constructie",s:"not_started",pr:"high",c:"ruwbouw",w:"b4",dl:"2026-08-25",nt:"",tp:"nodig",sb:[]},{id:"t8",r:"r8",h:"h5",ti:"Poort bouw",s:"in_progress",pr:"high",c:"ruwbouw",w:"b3",dl:"2026-07-30",nt:"Demontabel",tp:"nodig",sb:[{id:"s5",ti:"Zagen",d:true},{id:"s6",ti:"Frame",d:false}]},{id:"t9",r:"r9",h:"h5",ti:"Brandveiligheid",s:"not_started",pr:"critical",c:"overig",w:"b1",dl:"2026-07-15",nt:"Gemeente!",tp:"nodig",sb:[]},{id:"t10",r:"r9",h:"h5",ti:"Cirkel",s:"not_started",pr:"medium",c:"decoratie",w:"b7",dl:"2026-09-30",nt:"",tp:"nice",sb:[]}];
 
 const CS=["ruwbouw","decoratie","techniek","kleding","grime","overig"];
@@ -25,18 +26,26 @@ const[tb,sTb]=useState("home");const[cH,sCH]=useState(null);const[cR,sCR]=useSta
 const[eI,sEI]=useState(null);const[eF,sEF]=useState({});const[ld,sLd]=useState(1);
 const[q,sQ]=useState("");const[dB,sDB]=useState([]);const[dT,sDT]=useState([]);
 const[fb,sFb]=useState("");const[fo,sFo]=useState(0);
+const[M,sM]=useState([]);const[eM,sEM]=useState(null);const[eMf,sEMf]=useState({});const[nM,sNM]=useState(0);const[DBs,sDBs]=useState(DB);
 const[qa,sQa]=useState(0);const[qaF,sQaF]=useState({h:"",r:"",ti:"",pr:"medium",c:"overig",w:"",dl:"",tp:"nodig"});const[atF,sAtF]=useState({h:"all",s:"all",w:"all"});
+
 
 useEffect(()=>{
   const r=L("zr",null);
   const t=L("zt",null);
+  const uM=n=>{sM(n);S("zm",n)};
+  const uDBs=n=>{sDBs(n);S("zdb",n)};
   const u=L("zu",null);
   const dp=L("zd",null);
+  const m=L("zm",null);
+ const dbs=L("zdb",null);
   sR(r||iR);
   sT(t||iT);
   sU(u);
+  sM(m||iM);
+  if(dbs)sDBs(dbs);
   if(dp){sDB(dp.b||[]);sDT(dp.t||[])}
-  if(!r){S("zr",iR);S("zt",iT)}
+  if(!r){S("zr",iR);S("zt",iT);S("zm",iM)}
   sLd(0);
 },[]);
 
@@ -56,7 +65,7 @@ if(!U)return(<div style={{minHeight:"100vh",background:st.bg,color:"#fff",displa
 </button>)}</div></div>);
 
 const nav=()=><div style={{display:"flex",background:"#0a0a0a",borderTop:"1px solid #1a1a1a",padding:"6px 2px",position:"sticky",bottom:0,marginTop:12}}>
-{[["home","🏠","Home"],["search","🔍","Zoek"],["dag","☀️","Dag"],["team","👥","Team"]].map(([id,ic,lb])=>
+{[["home","🏠","Home"],["search","🔍","Zoek"],["dag","☀️","Dag"],["mile","🎯","Mijlp"],["team","👥","Team"]].map(([id,ic,lb])=>
 <button key={id} onClick={()=>{sTb(id);sCH(null);sCR(null)}} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:1,background:"none",border:"none",cursor:"pointer",padding:"3px 0",color:tb===id?"#dc2626":"#444",fontSize:14}}><span>{ic}</span><span style={{fontSize:8,fontWeight:600}}>{lb}</span></button>)}
 <button onClick={()=>{sU(null);S("zu",null)}} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1,background:"none",border:"none",cursor:"pointer",padding:"3px 6px",color:"#333",fontSize:14}}><span>↩</span><span style={{fontSize:8}}>Uit</span></button></div>;
 
@@ -69,7 +78,7 @@ const sideNav=()=><div style={{width:200,background:"#0a0a0a",borderRight:"1px s
 <div style={{fontSize:18,fontWeight:700,color:"#dc2626"}}>🎃 Horror Zone</div>
 <div style={{fontSize:10,color:"#444",marginTop:2}}>{U?.n}</div>
 </div>
-{[["home","🏠","Home"],["search","🔍","Zoeken"],["dag","☀️","Dagstart"],["team","👥","Team"]].map(([id,ic,lb])=>
+{[["home","🏠","Home"],["search","🔍","Zoeken"],["dag","☀️","Dagstart"],["mile","🎯","Mijlpalen"],["team","👥","Team"]].map(([id,ic,lb])=>
 <button key={id} onClick={()=>{sTb(id);sCH(null);sCR(null)}} style={{display:"flex",alignItems:"center",gap:10,background:tb===id?"#1a1a1a":"none",border:"none",cursor:"pointer",padding:"10px 12px",color:tb===id?"#dc2626":"#888",fontSize:13,borderRadius:6,textAlign:"left",fontWeight:tb===id?600:400}}>
 <span style={{fontSize:16}}>{ic}</span><span>{lb}</span></button>)}
 <div style={{marginTop:"auto",paddingTop:8,borderTop:"1px solid #1a1a1a"}}>
@@ -193,13 +202,74 @@ return wrap(<>
 {od.length>0&&<div style={{marginTop:8}}><div style={{fontSize:8,color:"#ef4444",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:3}}>⚠Achterstand({od.length})</div>
 {od.slice(0,4).map(t=><div key={t.id} style={{background:"#1a0505",border:"1px solid #7f1d1d",borderRadius:6,padding:5,marginBottom:3,display:"flex",justifyContent:"space-between"}}><span style={{fontSize:10,color:"#fca5a5"}}>{t.ti}</span><span style={{fontSize:9,color:"#ef4444"}}>{t.dl}</span></div>)}</div>}
 </>)}
-
+// MIJLPALEN
+if(tb==="mile"){const today=new Date(TD);const sorted=[...M].sort((a,b)=>a.dl.localeCompare(b.dl));
+  const mStatus=m=>{if(m.d)return{c:"#16a34a",l:"Gehaald",bg:"#0a1f0a",bd:"#166534"};const dd=new Date(m.dl);const diff=Math.ceil((dd-today)/(1000*60*60*24));if(diff<0)return{c:"#ef4444",l:"Gemist",bg:"#1a0505",bd:"#7f1d1d"};if(diff<=7)return{c:"#ef4444",l:`${diff}d`,bg:"#1a0505",bd:"#7f1d1d"};if(diff<=14)return{c:"#facc15",l:`${diff}d`,bg:"#1a1500",bd:"#854d0e"};return{c:"#888",l:`${diff}d`,bg:"#0f0f0f",bd:"#222"}};
+  return wrap(<>
+  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+  <h1 style={{fontSize:17,fontWeight:700,margin:0}}>🎯 Mijlpalen</h1>
+  {am&&<button onClick={()=>sNM(1)} style={btn(st.rd,"#fff")}>+ Nieuwe</button>}
+  </div>
+  <p style={{fontSize:10,color:"#444",marginBottom:10}}>{sorted.length} mijlpalen · {sorted.filter(m=>!m.d).length} open</p>
+  
+  {nM&&<div style={{...bx,border:`1px solid ${st.rd}`,padding:10,marginBottom:10}}>
+  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}><span style={{fontSize:11,fontWeight:600}}>Nieuwe mijlpaal</span><button onClick={()=>{sNM(0);sEMf({})}} style={{background:"none",border:"none",color:"#666",cursor:"pointer",fontSize:14}}>✕</button></div>
+  <input value={eMf.n||""} onChange={e=>sEMf({...eMf,n:e.target.value})} placeholder="Naam mijlpaal" style={{width:"100%",background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11,marginBottom:5,boxSizing:"border-box"}}/>
+  <input type="date" value={eMf.dl||""} onChange={e=>sEMf({...eMf,dl:e.target.value})} style={{width:"100%",background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11,marginBottom:5,boxSizing:"border-box"}}/>
+  <input value={eMf.nt||""} onChange={e=>sEMf({...eMf,nt:e.target.value})} placeholder="Notitie (optioneel)" style={{width:"100%",background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11,marginBottom:8,boxSizing:"border-box"}}/>
+  <button onClick={()=>{if(!eMf.n||!eMf.dl)return;uM([...M,{id:"m"+Date.now(),n:eMf.n,dl:eMf.dl,d:0,nt:eMf.nt||""}]);sNM(0);sEMf({})}} disabled={!eMf.n||!eMf.dl} style={{...btn(st.gn,"#fff"),width:"100%",opacity:eMf.n&&eMf.dl?1:.5}}>Toevoegen</button>
+  </div>}
+  
+  {isDesktop&&sorted.length>0&&<div style={{...bx,padding:14,marginBottom:12,overflowX:"auto"}}>
+  <div style={{display:"flex",alignItems:"flex-start",gap:0,minWidth:"100%",position:"relative",paddingTop:30,paddingBottom:6}}>
+  <div style={{position:"absolute",top:38,left:20,right:20,height:2,background:"#333"}}/>
+  {sorted.map((m,i)=>{const s=mStatus(m);return<div key={m.id} style={{flex:1,minWidth:90,display:"flex",flexDirection:"column",alignItems:"center",position:"relative",zIndex:1}}>
+  <div style={{fontSize:8,color:"#666",marginBottom:4,whiteSpace:"nowrap"}}>{new Date(m.dl).toLocaleDateString("nl-NL",{day:"numeric",month:"short"})}</div>
+  <div style={{width:14,height:14,borderRadius:"50%",background:s.bg,border:`2px solid ${s.c}`,marginBottom:6}}/>
+  <div style={{fontSize:9,color:"#aaa",textAlign:"center",lineHeight:1.2,maxWidth:90,wordWrap:"break-word"}}>{m.n}</div>
+  <div style={{fontSize:8,color:s.c,marginTop:2,fontWeight:600}}>{s.l}</div>
+  </div>})}
+  </div>
+  </div>}
+  
+  {sorted.map(m=>{const s=mStatus(m);if(eM===m.id)return<div key={m.id} style={{...bx,border:`1px solid ${st.rd}`,padding:10}}>
+  <input value={eMf.n||""} onChange={e=>sEMf({...eMf,n:e.target.value})} style={{width:"100%",background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11,marginBottom:5,boxSizing:"border-box"}}/>
+  <input type="date" value={eMf.dl||""} onChange={e=>sEMf({...eMf,dl:e.target.value})} style={{width:"100%",background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11,marginBottom:5,boxSizing:"border-box"}}/>
+  <input value={eMf.nt||""} onChange={e=>sEMf({...eMf,nt:e.target.value})} placeholder="Notitie" style={{width:"100%",background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11,marginBottom:8,boxSizing:"border-box"}}/>
+  <div style={{display:"flex",gap:4}}><button onClick={()=>{uM(M.map(x=>x.id===eM?{...x,n:eMf.n,dl:eMf.dl,nt:eMf.nt||""}:x));sEM(null)}} style={btn(st.gn,"#fff")}>Opslaan</button><button onClick={()=>sEM(null)} style={btn("#222","#888")}>Annuleer</button></div>
+  </div>;
+  return<div key={m.id} style={{...bx,borderColor:s.bd,background:s.bg,padding:10}}>
+  <div style={{display:"flex",alignItems:"flex-start",gap:8}}>
+  <button onClick={()=>am&&uM(M.map(x=>x.id===m.id?{...x,d:x.d?0:1}:x))} style={{background:"none",border:`2px solid ${s.c}`,borderRadius:"50%",width:18,height:18,cursor:am?"pointer":"default",padding:0,flexShrink:0,marginTop:2,display:"flex",alignItems:"center",justifyContent:"center",color:s.c,fontSize:11,fontWeight:700}}>{m.d?"✓":""}</button>
+  <div style={{flex:1,minWidth:0}}>
+  <div style={{fontSize:13,fontWeight:600,color:m.d?"#666":"#fff",textDecoration:m.d?"line-through":"none"}}>{m.n}</div>
+  <div style={{fontSize:10,color:"#666",marginTop:2,display:"flex",gap:8,flexWrap:"wrap"}}>
+  <span>📅 {new Date(m.dl).toLocaleDateString("nl-NL",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</span>
+  <span style={{color:s.c,fontWeight:600}}>{s.l}</span>
+  </div>
+  {m.nt&&<div style={{fontSize:10,color:"#ca8a04",marginTop:4,padding:"3px 6px",background:"#1a1500",border:"1px solid #433",borderRadius:4}}>⚠ {m.nt}</div>}
+  </div>
+  {am&&<div style={{display:"flex",gap:2,flexShrink:0}}>
+  <button onClick={()=>{sEMf({n:m.n,dl:m.dl,nt:m.nt});sEM(m.id)}} style={{background:"none",border:"none",color:"#666",cursor:"pointer",padding:2,fontSize:12}}>✏️</button>
+  <button onClick={()=>{if(confirm("Weet je zeker dat je deze mijlpaal wilt verwijderen?"))uM(M.filter(x=>x.id!==m.id))}} style={{background:"none",border:"none",color:"#666",cursor:"pointer",padding:2,fontSize:12}}>🗑</button>
+  </div>}
+  </div>
+  </div>})}
+  {sorted.length===0&&<div style={{...bx,textAlign:"center",color:"#333",fontSize:11,padding:20}}>Nog geen mijlpalen{am&&<><br/><span style={{fontSize:9}}>Klik op "+ Nieuwe" om er een toe te voegen</span></>}</div>}
+  </>)}
 // TEAM
 if(tb==="team")return wrap(<>
-<h1 style={{fontSize:17,fontWeight:700,marginBottom:8}}>👥 Team</h1>
-{DB.filter(b=>b.id!=="b0").map(b=>{const d=T.filter(t=>t.w===b.id&&t.s==="completed").length,ip=T.filter(t=>t.w===b.id&&t.s==="in_progress").length;return<div key={b.id} style={{...bx,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-<div style={{display:"flex",alignItems:"center",gap:6}}><div style={{width:28,height:28,borderRadius:"50%",background:"#1a1a1a",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontSize:11,color:"#555"}}>{b.n[0]}</div><span style={{fontSize:12,fontWeight:600}}>{b.n}<span style={{fontSize:9,color:"#444"}}> {b.r}</span></span></div>
-<span style={{fontSize:10}}><span style={{color:"#4ade80"}}>{d}✓</span> <span style={{color:"#facc15"}}>{ip}⏳</span></span></div>})}</>);
+  <h1 style={{fontSize:17,fontWeight:700,marginBottom:8}}>👥 Team</h1>
+  {DBs.filter(b=>b.id!=="b0").map(b=>{const d=T.filter(t=>t.w===b.id&&t.s==="completed").length,ip=T.filter(t=>t.w===b.id&&t.s==="in_progress").length;const isMe=U?.id===b.id;const isAdminB=b.p==="admin";
+  return<div key={b.id} style={{...bx,display:"flex",alignItems:"center",justifyContent:"space-between",gap:6}}>
+  <div style={{display:"flex",alignItems:"center",gap:6,flex:1,minWidth:0}}><div style={{width:28,height:28,borderRadius:"50%",background:"#1a1a1a",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontSize:11,color:"#555",flexShrink:0}}>{b.n[0]}</div>
+  <div style={{minWidth:0}}><div style={{fontSize:12,fontWeight:600}}>{b.n}{isMe&&<span style={{fontSize:9,color:"#666",marginLeft:4}}>(jij)</span>}</div><div style={{fontSize:9,color:"#444"}}>{b.r}</div></div>
+  </div>
+  <span style={{fontSize:10,whiteSpace:"nowrap"}}><span style={{color:"#4ade80"}}>{d}✓</span> <span style={{color:"#facc15"}}>{ip}⏳</span></span>
+  {am&&<button onClick={()=>{if(isMe){alert("Je kunt je eigen admin-rechten niet aanpassen.");return}const newP=isAdminB?b.r:"admin";uDBs(DBs.map(x=>x.id===b.id?{...x,p:newP}:x))}} disabled={isMe} style={{padding:"3px 7px",borderRadius:4,border:`1px solid ${isAdminB?"#7f1d1d":"#333"}`,background:isAdminB?"#1a0505":"#111",color:isAdminB?"#fca5a5":"#666",fontSize:9,cursor:isMe?"not-allowed":"pointer",opacity:isMe?.4:1,whiteSpace:"nowrap"}} title={isMe?"Je kunt jezelf niet de-adminnen":isAdminB?"Klik om admin-rechten in te trekken":"Klik om admin te maken"}>{isAdminB?"Admin ✓":"Maak admin"}</button>}
+  </div>})}
+  {am&&<div style={{marginTop:10,padding:8,background:"#0f0f0f",border:"1px solid #222",borderRadius:6,fontSize:9,color:"#555"}}>ℹ Admins kunnen taken aanmaken, mijlpalen beheren en andere admins aanwijzen. Wijzigingen worden zichtbaar zodra de betreffende persoon opnieuw inlogt.</div>}
+  </>);
 
 // HOME
 const tt=T.length,dn=T.filter(t=>t.s==="completed").length,ip=T.filter(t=>t.s==="in_progress").length,od=T.filter(t=>t.s!=="completed"&&t.dl&&t.dl<TD).length,tp=tt?Math.round(dn/tt*100):0;
