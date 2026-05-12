@@ -63,7 +63,27 @@ const nav=()=><div style={{display:"flex",background:"#0a0a0a",borderTop:"1px so
 const fbBtn=()=><div style={{marginTop:10}}>{!fo?<button onClick={()=>sFo(1)} style={{width:"100%",...bx,cursor:"pointer",color:"#444",fontSize:10,border:"1px dashed #333",textAlign:"center"}}>💬 Feedback</button>
 :<div style={{...bx,border:`1px solid ${st.rd}`}}><textarea value={fb} onChange={e=>sFb(e.target.value)} placeholder="Wat kan beter?" style={{width:"100%",background:"#1a1a1a",border:"1px solid #333",borderRadius:6,padding:6,color:"#fff",fontSize:11,minHeight:40,resize:"vertical",boxSizing:"border-box"}}/>
 <div style={{display:"flex",gap:4,marginTop:4}}><button onClick={()=>{const o=L("zfb",[]);S("zfb",[...o,{t:fb,u:U?.n,d:TD}]);sFb("");sFo(0)}} style={btn(st.rd,"#fff")}>Verstuur</button><button onClick={()=>{sFo(0);sFb("")}} style={btn("#222","#888")}>Annuleer</button></div></div>}</div>;
-
+const isDesktop=typeof window!=="undefined"&&window.innerWidth>=768;
+const sideNav=()=><div style={{width:200,background:"#0a0a0a",borderRight:"1px solid #1a1a1a",padding:"20px 12px",display:"flex",flexDirection:"column",gap:4,position:"sticky",top:0,height:"100vh"}}>
+<div style={{padding:"0 8px 16px",borderBottom:"1px solid #1a1a1a",marginBottom:8}}>
+<div style={{fontSize:18,fontWeight:700,color:"#dc2626"}}>🎃 Horror Zone</div>
+<div style={{fontSize:10,color:"#444",marginTop:2}}>{U?.n}</div>
+</div>
+{[["home","🏠","Home"],["search","🔍","Zoeken"],["dag","☀️","Dagstart"],["team","👥","Team"]].map(([id,ic,lb])=>
+<button key={id} onClick={()=>{sTb(id);sCH(null);sCR(null)}} style={{display:"flex",alignItems:"center",gap:10,background:tb===id?"#1a1a1a":"none",border:"none",cursor:"pointer",padding:"10px 12px",color:tb===id?"#dc2626":"#888",fontSize:13,borderRadius:6,textAlign:"left",fontWeight:tb===id?600:400}}>
+<span style={{fontSize:16}}>{ic}</span><span>{lb}</span></button>)}
+<div style={{marginTop:"auto",paddingTop:8,borderTop:"1px solid #1a1a1a"}}>
+<button onClick={()=>{sU(null);S("zu",null)}} style={{display:"flex",alignItems:"center",gap:10,background:"none",border:"none",cursor:"pointer",padding:"10px 12px",color:"#666",fontSize:13,borderRadius:6,textAlign:"left",width:"100%"}}>
+<span style={{fontSize:16}}>↩</span><span>Uitloggen</span></button>
+</div>
+</div>;
+const wrap=c=>isDesktop?
+<div style={{minHeight:"100vh",background:st.bg,color:"#fff",fontFamily:"system-ui",display:"flex"}}>
+{sideNav()}
+<div style={{flex:1,padding:"24px 32px",maxWidth:900,margin:"0 auto",width:"100%"}}>{c}{fbBtn()}</div>
+</div>
+:
+<div style={{minHeight:"100vh",background:st.bg,color:"#fff",padding:14,fontFamily:"system-ui",maxWidth:480,margin:"0 auto",paddingBottom:70}}>{c}{fbBtn()}{nav()}</div>;
 // TASK
 const Tk=({t,sr})=>{const ed=cE(U,t.c),a=DB.find(b=>b.id===t.w),od=t.s!=="completed"&&t.dl&&t.dl<TD,sd=(t.sb||[]).filter(x=>x.d).length,st2=(t.sb||[]).length;
 const[sh,sSh]=useState(0);const rm=R.find(x=>x.id===t.r),ho=DH.find(x=>x.id===t.h);
