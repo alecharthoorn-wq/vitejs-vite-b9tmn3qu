@@ -156,21 +156,79 @@ return wrap(<>
 
 // HOUSE
 if(cH){const h=cH,hr=R.filter(x=>x.h===h.id).sort((a,b)=>a.o-b.o),pr=hP(h.id,T),ht=T.filter(t=>t.h===h.id),dn=ht.filter(t=>t.s==="completed").length,ip=ht.filter(t=>t.s==="in_progress").length;
-return wrap(<>
-<button onClick={()=>sCH(null)} style={{background:"none",border:"none",color:"#666",fontSize:11,cursor:"pointer",padding:0,marginBottom:6}}>← Dashboard</button>
+const hOverdue=ht.filter(t=>t.s!=="completed"&&t.dl&&t.dl<TD);
+
+const backBtn=<button onClick={()=>sCH(null)} style={{background:"none",border:"none",color:"#666",fontSize:11,cursor:"pointer",padding:0,marginBottom:6}}>← Dashboard</button>;
+
+const houseHeader=<>
 <div style={{fontSize:9,color:st.rd,fontWeight:700,letterSpacing:2,textTransform:"uppercase"}}>{h.l}</div>
-<h1 style={{fontSize:17,fontWeight:700,margin:"2px 0 6px"}}>{h.n}</h1>
-<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4,marginBottom:6}}>
+<h1 style={{fontSize:isDesktop?22:17,fontWeight:700,margin:"2px 0 6px"}}>{h.n}</h1>
+</>;
+
+const houseStats=<div style={{display:"grid",gridTemplateColumns:isDesktop?"1fr 1fr":"1fr 1fr",gap:isDesktop?8:4,marginBottom:isDesktop?14:6}}>
 {[{l:"Voortgang",v:pr+"%",c:st.rd},{l:"Kamers",v:hr.length,c:"#3b82f6"},{l:"Hoofdbouw",v:DB.find(b=>b.id===h.ld)?.n||"—",c:st.gn},{l:"Deadline",v:h.dl,c:st.yw}].map((x,i)=>
-<div key={i} style={{...bx,textAlign:"center",padding:6}}><div style={{fontSize:8,color:"#444"}}>{x.l}</div><div style={{fontSize:14,fontWeight:700,color:x.c}}>{x.v}</div></div>)}</div>
-<div style={{height:4,background:"#222",borderRadius:2,marginBottom:2,display:"flex",overflow:"hidden"}}>{dn>0&&<div style={{background:st.gn,width:`${dn/ht.length*100}%`,height:"100%"}}/>}{ip>0&&<div style={{background:st.yw,width:`${ip/ht.length*100}%`,height:"100%"}}/>}</div>
-<div style={{display:"flex",gap:8,fontSize:9,color:"#444",marginBottom:10}}>🟢{dn} 🟡{ip} ⚪{ht.length-dn-ip}</div>
+<div key={i} style={{...bx,textAlign:"center",padding:isDesktop?10:6}}><div style={{fontSize:isDesktop?10:8,color:"#444"}}>{x.l}</div><div style={{fontSize:isDesktop?16:14,fontWeight:700,color:x.c}}>{x.v}</div></div>)}</div>;
+
+const progressBar=<>
+<div style={{height:5,background:"#222",borderRadius:2,marginBottom:3,display:"flex",overflow:"hidden"}}>{dn>0&&<div style={{background:st.gn,width:`${dn/ht.length*100}%`,height:"100%"}}/>}{ip>0&&<div style={{background:st.yw,width:`${ip/ht.length*100}%`,height:"100%"}}/>}</div>
+<div style={{display:"flex",gap:10,fontSize:10,color:"#444",marginBottom:isDesktop?14:10}}>🟢 {dn} klaar · 🟡 {ip} bezig · ⚪ {ht.length-dn-ip} open</div>
+</>;
+
+const roomsList=<>
+<div style={{fontSize:9,color:"#444",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>Kamers ({hr.length})</div>
+{hr.map(r=>{const rp=rP(r.id,T),rTasks=T.filter(t=>t.r===r.id);return<button key={r.id} onClick={()=>sCR(r)} style={{width:"100%",...bx,padding:isDesktop?12:10,cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",justifyContent:"space-between",color:"#fff"}}>
+<div style={{display:"flex",alignItems:"center",gap:8,flex:1}}><div style={{width:isDesktop?28:22,height:isDesktop?28:22,borderRadius:6,background:"#1a1a1a",display:"flex",alignItems:"center",justifyContent:"center",fontSize:isDesktop?12:10,fontWeight:700,color:"#444"}}>{r.o}</div>
+<div style={{flex:1}}>
+<div style={{fontSize:isDesktop?13:12,fontWeight:600}}>{r.n}</div>
+<div style={{fontSize:10,color:"#444",display:"flex",gap:8}}>
+<span>📋 {rTasks.length} taken</span>
+{r.cr.length>0&&<span>👥 {r.cr.length}</span>}
+{r.nt&&<span style={{color:"#ca8a04"}}>⚠</span>}
+</div>
+</div>
+</div>
+<div style={{display:"flex",alignItems:"center",gap:6}}><div style={{width:isDesktop?60:30}}><div style={{height:4,background:"#222",borderRadius:2,overflow:"hidden"}}><div style={{height:"100%",background:rp===100?st.gn:st.rd,width:`${rp}%`}}/></div></div>{isDesktop&&<span style={{fontSize:10,color:rp===100?st.gn:st.rd,fontWeight:600,minWidth:32,textAlign:"right"}}>{rp}%</span>}<span style={{color:"#333"}}>›</span></div></button>})}
+</>;
+
+const houseOverdueList=hOverdue.length>0&&<div>
+<div style={{fontSize:9,color:"#ef4444",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>⚠ Achterstand ({hOverdue.length})</div>
+{hOverdue.slice(0,isDesktop?6:3).map(t=>{const r=R.find(x=>x.id===t.r);return<div key={t.id} onClick={()=>sCR(r)} style={{background:"#1a0505",border:"1px solid #7f1d1d",borderRadius:6,padding:6,marginBottom:3,cursor:"pointer"}}>
+<div style={{fontSize:10,color:"#fca5a5",fontWeight:500}}>{t.ti}</div>
+<div style={{display:"flex",justifyContent:"space-between",fontSize:9,color:"#ef4444",marginTop:2}}><span>{r?.n}</span><span>{t.dl}</span></div>
+</div>})}
+</div>;
+
+const houseTeam=<div>
+<div style={{fontSize:9,color:"#444",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>Betrokken bouwers</div>
+{(()=>{const ids=new Set();hr.forEach(r=>r.cr.forEach(c=>ids.add(c)));ht.forEach(t=>t.w&&ids.add(t.w));const list=[...ids].map(id=>DBs.find(b=>b.id===id)).filter(Boolean);
+if(list.length===0)return<div style={{...bx,fontSize:10,color:"#444",textAlign:"center",padding:8}}>Geen bouwers toegewezen</div>;
+return<div style={{display:"flex",flexWrap:"wrap",gap:5}}>{list.map(b=><div key={b.id} style={{display:"flex",alignItems:"center",gap:5,padding:"4px 8px",background:"#1a1a1a",borderRadius:6,fontSize:10,color:"#aaa"}}><div style={{width:18,height:18,borderRadius:"50%",background:"#222",display:"flex",alignItems:"center",justifyContent:"center",fontSize:9,fontWeight:700,color:"#888"}}>{b.n[0]}</div>{b.n}</div>)}</div>})()}
+</div>;
+
+if(isDesktop)return wrap(<>
+{backBtn}
+{houseHeader}
+{progressBar}
+<div style={{display:"grid",gridTemplateColumns:"1.5fr 1fr",gap:20,alignItems:"start"}}>
+<div>{roomsList}</div>
+<div style={{position:"sticky",top:20}}>
+{houseStats}
+{houseOverdueList&&<div style={{marginBottom:14}}>{houseOverdueList}</div>}
+{houseTeam}
+</div>
+</div>
+</>);
+
+return wrap(<>
+{backBtn}
+{houseHeader}
+{houseStats}
+{progressBar}
 {hr.map(r=>{const rp=rP(r.id,T);return<button key={r.id} onClick={()=>sCR(r)} style={{width:"100%",...bx,cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",justifyContent:"space-between",color:"#fff"}}>
 <div style={{display:"flex",alignItems:"center",gap:6,flex:1}}><div style={{width:22,height:22,borderRadius:5,background:"#1a1a1a",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:"#444"}}>{r.o}</div>
 <div><div style={{fontSize:12,fontWeight:600}}>{r.n}</div><div style={{fontSize:9,color:"#444"}}>{T.filter(t=>t.r===r.id).length} taken</div></div></div>
 <div style={{display:"flex",alignItems:"center",gap:4}}><div style={{width:30}}><div style={{height:3,background:"#222",borderRadius:2,overflow:"hidden"}}><div style={{height:"100%",background:rp===100?st.gn:st.rd,width:`${rp}%`}}/></div></div><span style={{color:"#333"}}>›</span></div></button>})}
 </>)}
-
 // SEARCH
 if(tb==="search"){const ql=q.toLowerCase();const res=[];
 if(ql){DH.forEach(h=>{if((h.n+h.d+h.l).toLowerCase().includes(ql))res.push({i:"🏚️",l:h.n,s:h.d,a:()=>sCH(h)})});
