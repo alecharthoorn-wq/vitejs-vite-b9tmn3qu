@@ -99,7 +99,27 @@ style={{background:"none",border:"none",marginTop:1,cursor:ed?"pointer":"default
 <button onClick={()=>uT(T.filter(x=>x.id!==t.id))} style={{background:"none",border:"none",color:"#333",cursor:"pointer",padding:2,fontSize:11}}>🗑</button></div>}
 </div></div>};
 
-const wrap=c=><div style={{minHeight:"100vh",background:st.bg,color:"#fff",padding:14,fontFamily:"system-ui",maxWidth:480,margin:"0 auto",paddingBottom:70}}>{c}{fbBtn()}{nav()}</div>;
+const isDesktop=typeof window!=="undefined"&&window.innerWidth>=768;
+const sideNav=()=><div style={{width:200,background:"#0a0a0a",borderRight:"1px solid #1a1a1a",padding:"20px 12px",display:"flex",flexDirection:"column",gap:4,position:"sticky",top:0,height:"100vh"}}>
+<div style={{padding:"0 8px 16px",borderBottom:"1px solid #1a1a1a",marginBottom:8}}>
+<div style={{fontSize:18,fontWeight:700,color:"#dc2626"}}>🎃 Horror Zone</div>
+<div style={{fontSize:10,color:"#444",marginTop:2}}>{U?.n}</div>
+</div>
+{[["home","🏠","Home"],["search","🔍","Zoeken"],["dag","☀️","Dagstart"],["team","👥","Team"]].map(([id,ic,lb])=>
+<button key={id} onClick={()=>{sTb(id);sCH(null);sCR(null)}} style={{display:"flex",alignItems:"center",gap:10,background:tb===id?"#1a1a1a":"none",border:"none",cursor:"pointer",padding:"10px 12px",color:tb===id?"#dc2626":"#888",fontSize:13,borderRadius:6,textAlign:"left",fontWeight:tb===id?600:400}}>
+<span style={{fontSize:16}}>{ic}</span><span>{lb}</span></button>)}
+<div style={{marginTop:"auto",paddingTop:8,borderTop:"1px solid #1a1a1a"}}>
+<button onClick={()=>{sU(null);S("zu",null)}} style={{display:"flex",alignItems:"center",gap:10,background:"none",border:"none",cursor:"pointer",padding:"10px 12px",color:"#666",fontSize:13,borderRadius:6,textAlign:"left",width:"100%"}}>
+<span style={{fontSize:16}}>↩</span><span>Uitloggen</span></button>
+</div>
+</div>;
+const wrap=c=>isDesktop?
+<div style={{minHeight:"100vh",background:st.bg,color:"#fff",fontFamily:"system-ui",display:"flex"}}>
+{sideNav()}
+<div style={{flex:1,padding:"24px 32px",maxWidth:900,margin:"0 auto",width:"100%"}}>{c}{fbBtn()}</div>
+</div>
+:
+<div style={{minHeight:"100vh",background:st.bg,color:"#fff",padding:14,fontFamily:"system-ui",maxWidth:480,margin:"0 auto",paddingBottom:70}}>{c}{fbBtn()}{nav()}</div>;
 
 // ROOM
 if(cR){const rm=cR,ho=DH.find(x=>x.id===rm.h),rt=T.filter(t=>t.r===rm.id),pr=rP(rm.id,T);
