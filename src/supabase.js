@@ -5,6 +5,13 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
+// === PIN HASHING ===
+export const hashPin = async (pin) => {
+  const data = new TextEncoder().encode(pin);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+};
+
 // === LEZEN ===
 export const loadAll = async () => {
   const [houses, rooms, tasks, people, milestones, dagstart, feedback] = await Promise.all([
