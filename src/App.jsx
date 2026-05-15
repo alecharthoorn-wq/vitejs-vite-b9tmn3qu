@@ -6,6 +6,7 @@ const hashPin = async (pin) => {
   const hash = await crypto.subtle.digest('SHA-256', data);
   return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 };
+const tw=t=>Array.isArray(t.w)?t.w:t.w?[t.w]:[];
 
 const DB=[{id:"b1",n:"Ron",r:"bouw",p:"admin"},{id:"b2",n:"Remco",r:"bouw",p:"bouw"},{id:"b3",n:"Sim",r:"deco",p:"decoratie"},{id:"b4",n:"Ricardo",r:"bouw",p:"bouw"},{id:"b5",n:"Koen L",r:"techniek",p:"techniek"},{id:"b6",n:"Jeroen",r:"techniek",p:"techniek"},{id:"b7",n:"Sanna",r:"deco",p:"decoratie"},{id:"b8",n:"Bart",r:"ict",p:"admin"},{id:"b0",n:"Alec",r:"admin",p:"admin"}];
 const DH=[{id:"h1",n:"Hail Mary Hospital",d:"Update in loods",l:"loods",ld:"b1",dl:"2026-11-01"},{id:"h2",n:"Huckabay Highstreet",d:"Update in loods",l:"loods",ld:"b4",dl:"2026-11-01"},{id:"h3",n:"The Barn",d:"Nieuw in tent",l:"tent",ld:"b1",dl:"2026-11-08"},{id:"h4",n:"The Mine",d:"Nieuw in tent",l:"tent",ld:"b4",dl:"2026-11-08"},{id:"h5",n:"The Woods",d:"Bosroute",l:"bos",ld:"b3",dl:"2026-11-08"}];
@@ -34,7 +35,7 @@ const[q,sQ]=useState("");const[dB,sDB]=useState([]);const[dT,sDT]=useState([]);
 const[fb,sFb]=useState("");const[fo,sFo]=useState(0);
 const[M,sM]=useState([]);const[eM,sEM]=useState(null);const[eMf,sEMf]=useState({});const[nM,sNM]=useState(0);const[DBs,sDBs]=useState(DB);
 const[w,sW]=useState(typeof window!=="undefined"?window.innerWidth:1024);
-const[qa,sQa]=useState(0);const[qaF,sQaF]=useState({h:"",r:"",ti:"",pr:"medium",c:"overig",w:"",dl:"",tp:"nodig",milestone_id:""});const[atF,sAtF]=useState({h:"all",s:"all",w:"all"});
+const[qa,sQa]=useState(0);const[qaF,sQaF]=useState({h:"",r:"",ti:"",pr:"medium",c:"overig",w:[],dl:"",tp:"nodig",milestone_id:""});const[atF,sAtF]=useState({h:"all",s:"all",w:"all"});
 const[nB,sNB]=useState(0);const[nBf,sNBf]=useState({n:"",r:"bouw",p:"normaal"});
 const[cP,sCP]=useState(null);
 const[DHs,sDHs]=useState([]);
@@ -44,6 +45,8 @@ const[shM,sShM]=useState({});
 const[dQa,sDQa]=useState(0);const[dQaF,sDQaF]=useState({h:"",r:"",ti:"",w:""});
 const[matF,sMatF]=useState("all");
 const[nMat,sNMat]=useState({n:"",q:1,s:"nodig",rooms:[]});const[nMatO,sNMatO]=useState(0);
+const[dagQ,sDagQ]=useState("");
+const[dagW,sDagW]=useState(null);const[dagWp,sDagWp]=useState("");
 
 useEffect(()=>{
   (async()=>{
@@ -173,18 +176,19 @@ const wrap=c=>isDesktop?
 <div style={{minHeight:"100vh",background:st.bg,color:"#fff",padding:14,fontFamily:"system-ui",maxWidth:480,margin:"0 auto",paddingBottom:70}}>{demoBanner}{c}{fbBtn()}{nav()}</div>;
 
 // TASK
-const Tk=({t,sr})=>{const ed=cE(U,t.c),a=DBs.find(b=>b.id===t.w),od=t.s!=="completed"&&t.dl&&t.dl<TD,sd=(t.sb||[]).filter(x=>x.d).length,st2=(t.sb||[]).length;
+const Tk=({t,sr})=>{const ed=cE(U,t.c),wIds=tw(t),wNames=wIds.map(id=>DBs.find(b=>b.id===id)).filter(Boolean),od=t.s!=="completed"&&t.dl&&t.dl<TD,sd=(t.sb||[]).filter(x=>x.d).length,st2=(t.sb||[]).length;
 const[eSb,sESb]=useState(null);const[eSbT,sESbT]=useState("");const[nSb,sNSb]=useState("");const sh=shT[t.id];const rm=R.find(x=>x.id===t.r),ho=DHs.find(x=>x.id===t.h);
 if(eI===t.id)return<div style={{...bx,border:"1px solid #dc2626"}}><input value={eF.ti||""} onChange={e=>sEF({...eF,ti:e.target.value})} style={{width:"100%",background:"#1a1a1a",border:"1px solid #333",borderRadius:6,padding:5,color:"#fff",fontSize:12,marginBottom:4,boxSizing:"border-box"}}/>
 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4,marginBottom:4}}>
 <select value={eF.pr} onChange={e=>sEF({...eF,pr:e.target.value})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:4,color:"#fff",fontSize:10}}>{["low","medium","high","critical"].map(v=><option key={v}>{v}</option>)}</select>
 <select value={eF.c} onChange={e=>sEF({...eF,c:e.target.value})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:4,color:"#fff",fontSize:10}}>{CS.map(v=><option key={v}>{v}</option>)}</select>
-<select value={eF.w||""} onChange={e=>sEF({...eF,w:e.target.value})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:4,color:"#fff",fontSize:10}}><option value="">—</option>{DBs.map(b=><option key={b.id} value={b.id}>{b.n}</option>)}</select>
 <input type="date" value={eF.dl||""} onChange={e=>sEF({...eF,dl:e.target.value})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:4,color:"#fff",fontSize:10}}/>
 <select value={eF.tp} onChange={e=>sEF({...eF,tp:e.target.value})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:4,color:"#fff",fontSize:10}}><option value="nodig">Nodig</option><option value="nice">Nice to have</option></select>
 <select value={eF.milestone_id||""} onChange={e=>sEF({...eF,milestone_id:e.target.value})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:4,color:"#fff",fontSize:10}}><option value="">Geen mijlpaal</option>{M.map(m=><option key={m.id} value={m.id}>{m.n}</option>)}</select></div>
+<div style={{fontSize:9,color:"#999",marginBottom:3}}>Verantwoordelijken</div>
+<div style={{display:"flex",flexWrap:"wrap",gap:3,marginBottom:4}}>{DBs.filter(b=>b.id!=="b0").map(b=>{const sel=(eF.w||[]).includes(b.id);return<button key={b.id} onClick={()=>{const cur=eF.w||[];sEF({...eF,w:sel?cur.filter(x=>x!==b.id):[...cur,b.id]})}} style={{padding:"3px 7px",borderRadius:4,border:`1px solid ${sel?"#166534":"#333"}`,background:sel?"#0a1f0a":"#111",color:sel?"#4ade80":"#888",fontSize:9,cursor:"pointer"}}>{b.n}</button>})}</div>
 <textarea value={eF.nt||""} onChange={e=>sEF({...eF,nt:e.target.value})} placeholder="Notitie" style={{width:"100%",background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:4,color:"#fff",fontSize:10,minHeight:30,resize:"vertical",marginBottom:4,boxSizing:"border-box"}}/>
-<div style={{display:"flex",gap:4,marginTop:4}}><button onClick={async()=>{await updateTask({...t,...eF});sEI(null)}} style={btn(st.gn,"#fff")}>Opslaan</button><button onClick={()=>sEI(null)} style={btn("#222","#bbb")}>Annuleer</button>{am&&<button onClick={()=>{if(confirm("Verwijderen?"))removeTask(t.id)}} style={btn("#7f1d1d","#fff")}>🗑</button>}</div></div>;
+<div style={{display:"flex",gap:4,marginTop:4}}><button onClick={async()=>{const clean={...eF,milestone_id:eF.milestone_id||null,dl:eF.dl||null,w:eF.w||[]};await updateTask({...t,...clean});sEI(null)}} style={btn(st.gn,"#fff")}>Opslaan</button><button onClick={()=>sEI(null)} style={btn("#222","#bbb")}>Annuleer</button>{am&&<button onClick={()=>{if(confirm("Verwijderen?"))removeTask(t.id)}} style={btn("#7f1d1d","#fff")}>🗑</button>}</div></div>;
 return<div style={{...bx,padding:7,marginBottom:4,borderColor:od?"#7f1d1d":t.tp==="nice"?"#1e3a5f":"#222"}}>
 <div style={{display:"flex",alignItems:"center",gap:6}}>
 <button onClick={()=>{if(!ed)return;const ns=t.s==="completed"?"not_started":t.s==="in_progress"?"completed":"in_progress";updateTask({...t,s:ns})}} style={{background:"none",border:"none",cursor:ed?"pointer":"default",padding:0,fontSize:16,flexShrink:0}}>{t.s==="completed"?"✅":t.s==="in_progress"?"🔄":"⭕"}</button>
@@ -193,7 +197,7 @@ return<div style={{...bx,padding:7,marginBottom:4,borderColor:od?"#7f1d1d":t.tp=
 <div style={{fontSize:9,color:"#bbb",display:"flex",gap:5,flexWrap:"wrap",marginTop:1}}>
 <span style={{padding:"1px 4px",borderRadius:3,background:t.pr==="critical"?"#7f1d1d":t.pr==="high"?"#854d0e":"#1a1a1a",color:t.pr==="critical"?"#fff":t.pr==="high"?"#fde047":"#ccc"}}>{t.pr}</span>
 <span>{t.c}</span>
-{a&&<span>👤{a.n}</span>}
+{wNames.length>0&&<span>👤{wNames.map(b=>b.n).join(", ")}</span>}
 {t.dl&&<span style={{color:od?"#ef4444":"#bbb"}}>📅{t.dl}</span>}
 <span style={{padding:"0 4px",borderRadius:3,background:t.tp==="nodig"?"#1a0505":"#05051a",color:t.tp==="nodig"?"#f87171":"#60a5fa"}}>{t.tp||"nodig"}</span>
 {st2>0&&<span>📋{sd}/{st2}</span>}
@@ -202,7 +206,7 @@ return<div style={{...bx,padding:7,marginBottom:4,borderColor:od?"#7f1d1d":t.tp=
 {t.nt&&<div style={{fontSize:9,color:"#ca8a04",marginTop:2}}>⚠ {t.nt}</div>}
 </div>
 {ed&&<div style={{display:"flex",gap:2,flexShrink:0}}>
-<button onClick={()=>{sEF({ti:t.ti,pr:t.pr,c:t.c,w:t.w,dl:t.dl,nt:t.nt,tp:t.tp,milestone_id:t.milestone_id||""});sEI(t.id)}} style={{background:"none",border:"none",color:"#bbb",cursor:"pointer",fontSize:12,padding:2}}>✏️</button>
+<button onClick={()=>{sEF({ti:t.ti,pr:t.pr,c:t.c,w:tw(t),dl:t.dl,nt:t.nt,tp:t.tp,milestone_id:t.milestone_id||""});sEI(t.id)}} style={{background:"none",border:"none",color:"#bbb",cursor:"pointer",fontSize:12,padding:2}}>✏️</button>
 {(st2>0||ed)&&<button onClick={()=>sShT(p=>({...p,[t.id]:!p[t.id]}))} style={{background:"none",border:"none",color:"#bbb",cursor:"pointer",fontSize:12,padding:2}}>{sh?"▲":"▼"}</button>}
 </div>}
 </div>
@@ -272,7 +276,7 @@ if(cR){const rm=cR,ho=DHs.find(x=>x.id===rm.h),rt=T.filter(t=>t.r===rm.id),pr=rP
   </div>)}
   </div>;
   
-  const addTaskBtn=am&&<button onClick={async()=>{const t={id:"t"+Date.now(),r:rm.id,h:rm.h,ti:"Nieuwe taak",s:"not_started",pr:"medium",c:"overig",w:null,dl:null,nt:"",tp:"nodig",sb:[],milestone_id:null};console.log("addTask room:",t);await addTask(t)}} style={btn(st.rd,"#fff")}>+ Taak toevoegen</button>;
+  const addTaskBtn=am&&<button onClick={async()=>{const t={id:"t"+Date.now(),r:rm.id,h:rm.h,ti:"Nieuwe taak",s:"not_started",pr:"medium",c:"overig",w:[],dl:null,nt:"",tp:"nodig",sb:[],milestone_id:null};console.log("addTask room:",t);await addTask(t)}} style={btn(st.rd,"#fff")}>+ Taak toevoegen</button>;
   
   const tasksBlock=<div>
   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
@@ -319,7 +323,7 @@ if(cR){const rm=cR,ho=DHs.find(x=>x.id===rm.h),rt=T.filter(t=>t.r===rm.id),pr=rP
   </>}
   </div>)}
   <div style={{display:"flex",justifyContent:"space-between",marginBottom:3,marginTop:8}}><span style={{fontSize:9,color:"#999",fontWeight:700,letterSpacing:2,textTransform:"uppercase"}}>Taken({rt.length})</span>
-  {am&&<button onClick={async()=>{const t={id:"t"+Date.now(),r:rm.id,h:rm.h,ti:"Nieuwe taak",s:"not_started",pr:"medium",c:"overig",w:null,dl:null,nt:"",tp:"nodig",sb:[],milestone_id:null};console.log("addTask room:",t);await addTask(t)}} style={btn(st.rd,"#fff")}>+ Taak</button>}</div>
+  {am&&<button onClick={async()=>{const t={id:"t"+Date.now(),r:rm.id,h:rm.h,ti:"Nieuwe taak",s:"not_started",pr:"medium",c:"overig",w:[],dl:null,nt:"",tp:"nodig",sb:[],milestone_id:null};console.log("addTask room:",t);await addTask(t)}} style={btn(st.rd,"#fff")}>+ Taak</button>}</div>
   {tasksNodig.length>0&&<div style={{fontSize:8,color:"#f87171",fontWeight:700,marginBottom:2}}>NODIG</div>}
   {tasksNodig.map(t=><Tk key={t.id} t={t}/>)}
   {tasksNice.length>0&&<div style={{fontSize:8,color:"#60a5fa",fontWeight:700,marginBottom:2,marginTop:4}}>NICE TO HAVE</div>}
@@ -373,7 +377,7 @@ const houseOverdueList=hOverdue.length>0&&<div>
 
 const houseTeam=<div>
 <div style={{fontSize:9,color:"#999",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>Betrokken bouwers</div>
-{(()=>{const ids=new Set();hr.forEach(r=>r.cr.forEach(c=>ids.add(c)));ht.forEach(t=>t.w&&ids.add(t.w));const list=[...ids].map(id=>DBs.find(b=>b.id===id)).filter(Boolean);
+{(()=>{const ids=new Set();hr.forEach(r=>r.cr.forEach(c=>ids.add(c)));ht.forEach(t=>tw(t).forEach(w=>ids.add(w)));const list=[...ids].map(id=>DBs.find(b=>b.id===id)).filter(Boolean);
 if(list.length===0)return<div style={{...bx,fontSize:10,color:"#999",textAlign:"center",padding:8}}>Geen bouwers toegewezen</div>;
 return<div style={{display:"flex",flexWrap:"wrap",gap:5}}>{list.map(b=><div key={b.id} style={{display:"flex",alignItems:"center",gap:5,padding:"4px 8px",background:"#1a1a1a",borderRadius:6,fontSize:10,color:"#aaa"}}><div style={{width:18,height:18,borderRadius:"50%",background:"#222",display:"flex",alignItems:"center",justifyContent:"center",fontSize:9,fontWeight:700,color:"#ccc"}}>{b.n[0]}</div>{b.n}</div>)}</div>})()}
 </div>;
@@ -434,7 +438,7 @@ return wrap(<>
 </>)}
 
 // DAGSTART
-if(tb==="dag"){const dtT=T.filter(t=>dT.includes(t.id)),up=T.filter(t=>t.s!=="completed"&&t.dl&&t.dl<=TD&&!dT.includes(t.id)),od=T.filter(t=>t.s!=="completed"&&t.dl&&t.dl<TD);
+if(tb==="dag"){const dtT=T.filter(t=>dT.includes(t.id)),up=T.filter(t=>t.s!=="completed"&&!dT.includes(t.id)),od=T.filter(t=>t.s!=="completed"&&t.dl&&t.dl<TD);
 const dagStartNodig=dtT.filter(t=>(t.tp||"nodig")==="nodig");
 const dagStartNice=dtT.filter(t=>t.tp==="nice");
 
@@ -448,27 +452,48 @@ const presentBlock=<div>
 <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:isDesktop?14:10}}>{DBs.filter(b=>b.id!=="b0").map(b=>{const s=dB.includes(b.id);return<button key={b.id} onClick={()=>{if(!am)return;const n=s?dB.filter(x=>x!==b.id):[...dB,b.id];sDB(n);updateDagstart(n,dT)}} style={{padding:"4px 10px",borderRadius:14,border:`1px solid ${s?"#166534":"#222"}`,background:s?"#0a1f0a":"#111",color:s?"#4ade80":"#444",fontSize:10,cursor:am?"pointer":"default"}}>{b.n}</button>})}</div>
 </div>;
 
+const upFiltered=dagQ.trim()?up.filter(t=>{const qL=dagQ.toLowerCase();const r=R.find(x=>x.id===t.r),h=DHs.find(x=>x.id===t.h);return t.ti.toLowerCase().includes(qL)||(h?.n||"").toLowerCase().includes(qL)||(r?.n||"").toLowerCase().includes(qL)}):up;
+
+const addTaskToDay=(t)=>{const workers=tw(t);const anyPresent=workers.length===0||workers.some(id=>dB.includes(id));if(anyPresent){const n=[...dT,t.id];sDT(n);updateDagstart(dB,n);sDagQ("")}else{sDagW(t);sDagWp("")}};
+
 const addToTodayBlock=am&&up.length>0&&<div>
-<div style={{fontSize:9,color:"#999",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>Toevoegen aan vandaag ({up.length})</div>
-{up.slice(0,isDesktop?8:5).map(t=>{const r=R.find(x=>x.id===t.r),h=DHs.find(x=>x.id===t.h);return<button key={t.id} onClick={()=>{const n=[...dT,t.id];sDT(n);updateDagstart(dB,n)}} style={{width:"100%",...bx,cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:6,color:"#fff",padding:7}}>
+<div style={{fontSize:9,color:"#999",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>Bestaande taken toevoegen ({up.length})</div>
+<input value={dagQ} onChange={e=>sDagQ(e.target.value)} placeholder="Zoek taken op naam, huis, kamer…" style={{width:"100%",background:"#1a1a1a",border:"1px solid #333",borderRadius:6,padding:"6px 10px",color:"#fff",fontSize:11,marginBottom:6,boxSizing:"border-box"}}/>
+
+{dagW&&<div style={{...bx,border:"1px solid #854d0e",background:"#1a1500",padding:10,marginBottom:6}}>
+<div style={{fontSize:11,fontWeight:600,color:"#facc15",marginBottom:4}}>⚠ Geen verantwoordelijke aanwezig</div>
+<div style={{fontSize:10,color:"#bbb",marginBottom:6}}>"{dagW.ti}" is toegewezen aan {tw(dagW).map(id=>DBs.find(b=>b.id===id)?.n).filter(Boolean).join(", ")||"niemand"}, maar die {tw(dagW).length===1?"is":"zijn"} vandaag niet aanwezig.</div>
+<div style={{fontSize:9,color:"#999",marginBottom:4}}>Kies een aanwezige om toe te voegen:</div>
+<div style={{display:"flex",flexWrap:"wrap",gap:3,marginBottom:6}}>{DBs.filter(b=>dB.includes(b.id)).map(b=><button key={b.id} onClick={()=>sDagWp(b.id)} style={{padding:"3px 7px",borderRadius:4,border:`1px solid ${dagWp===b.id?"#166534":"#333"}`,background:dagWp===b.id?"#0a1f0a":"#111",color:dagWp===b.id?"#4ade80":"#888",fontSize:9,cursor:"pointer"}}>{b.n}</button>)}</div>
+<div style={{display:"flex",gap:4}}>
+<button onClick={async()=>{if(!dagWp)return;const newW=[...tw(dagW),dagWp];await updateTask({...dagW,w:newW});const n=[...dT,dagW.id];sDT(n);updateDagstart(dB,n);sDagW(null);sDagQ("")}} disabled={!dagWp} style={{...btn(st.gn,"#fff"),opacity:dagWp?1:.5,cursor:dagWp?"pointer":"not-allowed"}}>Toevoegen + toewijzen</button>
+<button onClick={()=>{const n=[...dT,dagW.id];sDT(n);updateDagstart(dB,n);sDagW(null);sDagQ("")}} style={btn("#333","#bbb")}>Toch toevoegen</button>
+<button onClick={()=>sDagW(null)} style={btn("#222","#888")}>Annuleer</button>
+</div>
+</div>}
+
+{upFiltered.slice(0,isDesktop?12:8).map(t=>{const r=R.find(x=>x.id===t.r),h=DHs.find(x=>x.id===t.h);return<button key={t.id} onClick={()=>addTaskToDay(t)} style={{width:"100%",...bx,cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:6,color:"#fff",padding:7}}>
 <span style={{color:st.rd,fontSize:14,fontWeight:700}}>+</span>
 <div style={{flex:1}}><div style={{fontSize:11,fontWeight:500}}>{t.ti}</div><div style={{fontSize:9,color:"#999"}}>{h?.n}→{r?.n}</div></div>
 <span style={{fontSize:9,padding:"2px 6px",borderRadius:4,background:t.tp==="nodig"?"#1a0505":"#05051a",color:t.tp==="nodig"?"#f87171":"#60a5fa"}}>{t.tp}</span>
 </button>})}
+{upFiltered.length>=(isDesktop?12:8)&&<div style={{fontSize:9,color:"#888",textAlign:"center",padding:4}}>Gebruik zoeken om meer taken te vinden…</div>}
+{dagQ&&upFiltered.length===0&&<div style={{fontSize:10,color:"#888",textAlign:"center",padding:8}}>Geen taken gevonden voor "{dagQ}"</div>}
 </div>;
 
 const dQaRooms=dQaF.h?R.filter(r=>r.h===dQaF.h):[];
 const dagNewTask=am&&<div>
 {!dQa?<button onClick={()=>sDQa(1)} style={{width:"100%",background:st.rd,color:"#fff",border:"none",borderRadius:8,padding:"8px 12px",cursor:"pointer",fontSize:12,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>+ Nieuwe dagtaak</button>
 :<div style={{...bx,border:`1px solid ${st.rd}`,padding:10}}>
-<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}><span style={{fontSize:11,fontWeight:600}}>Nieuwe taak voor vandaag</span><button onClick={()=>{sDQa(0);sDQaF({h:"",r:"",ti:"",w:""})}} style={{background:"none",border:"none",color:"#bbb",cursor:"pointer",fontSize:14}}>✕</button></div>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}><span style={{fontSize:11,fontWeight:600}}>Nieuwe taak voor vandaag</span><button onClick={()=>{sDQa(0);sDQaF({h:"",r:"",ti:"",w:[]})}} style={{background:"none",border:"none",color:"#bbb",cursor:"pointer",fontSize:14}}>✕</button></div>
 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4,marginBottom:4}}>
 <select value={dQaF.h} onChange={e=>sDQaF({...dQaF,h:e.target.value,r:""})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11}}><option value="">Huis…</option>{DHs.map(h=><option key={h.id} value={h.id}>{h.n}</option>)}</select>
 <select value={dQaF.r} onChange={e=>sDQaF({...dQaF,r:e.target.value})} disabled={!dQaF.h} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11,opacity:dQaF.h?1:.5}}><option value="">Kamer…</option>{dQaRooms.map(r=><option key={r.id} value={r.id}>{r.n}</option>)}</select>
 </div>
 <input value={dQaF.ti} onChange={e=>sDQaF({...dQaF,ti:e.target.value})} placeholder="Taaknaam" style={{width:"100%",background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11,marginBottom:4,boxSizing:"border-box"}}/>
-<select value={dQaF.w} onChange={e=>sDQaF({...dQaF,w:e.target.value})} style={{width:"100%",background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11,marginBottom:6,boxSizing:"border-box"}}><option value="">Toewijzen aan…</option>{DBs.map(b=><option key={b.id} value={b.id}>{b.n}</option>)}</select>
-<button onClick={async()=>{if(!dQaF.h||!dQaF.r||!dQaF.ti.trim())return;const newId="t"+Date.now();await addTask({id:newId,r:dQaF.r,h:dQaF.h,ti:dQaF.ti.trim(),s:"not_started",pr:"medium",c:"overig",w:dQaF.w,dl:TD,nt:"",tp:"nodig",sb:[],milestone_id:null});const n=[...dT,newId];sDT(n);updateDagstart(dB,n);sDQa(0);sDQaF({h:"",r:"",ti:"",w:""})}} disabled={!dQaF.h||!dQaF.r||!dQaF.ti.trim()} style={{...btn(st.gn,"#fff"),width:"100%",padding:"6px 10px",opacity:dQaF.h&&dQaF.r&&dQaF.ti.trim()?1:.5,cursor:dQaF.h&&dQaF.r&&dQaF.ti.trim()?"pointer":"not-allowed"}}>Aanmaken & toevoegen aan vandaag</button>
+{dB.length>0&&<><div style={{fontSize:9,color:"#999",marginBottom:3}}>Toewijzen aan aanwezigen</div>
+<div style={{display:"flex",flexWrap:"wrap",gap:3,marginBottom:6}}>{DBs.filter(b=>dB.includes(b.id)).map(b=>{const sel=(dQaF.w||[]).includes(b.id);return<button key={b.id} onClick={()=>{const cur=dQaF.w||[];sDQaF({...dQaF,w:sel?cur.filter(x=>x!==b.id):[...cur,b.id]})}} style={{padding:"3px 7px",borderRadius:4,border:`1px solid ${sel?"#166534":"#333"}`,background:sel?"#0a1f0a":"#111",color:sel?"#4ade80":"#888",fontSize:9,cursor:"pointer"}}>{b.n}</button>})}</div></>}
+<button onClick={async()=>{if(!dQaF.h||!dQaF.r||!dQaF.ti.trim())return;const newId="t"+Date.now();await addTask({id:newId,r:dQaF.r,h:dQaF.h,ti:dQaF.ti.trim(),s:"not_started",pr:"medium",c:"overig",w:dQaF.w||[],dl:TD,nt:"",tp:"nodig",sb:[],milestone_id:null});const n=[...dT,newId];sDT(n);updateDagstart(dB,n);sDQa(0);sDQaF({h:"",r:"",ti:"",w:[]})}} disabled={!dQaF.h||!dQaF.r||!dQaF.ti.trim()} style={{...btn(st.gn,"#fff"),width:"100%",padding:"6px 10px",opacity:dQaF.h&&dQaF.r&&dQaF.ti.trim()?1:.5,cursor:dQaF.h&&dQaF.r&&dQaF.ti.trim()?"pointer":"not-allowed"}}>Aanmaken & toevoegen aan vandaag</button>
 </div>}
 </div>;
 
@@ -477,9 +502,15 @@ const todayBlock=<div>
 {!dtT.length?<div style={{...bx,textAlign:"center",color:"#888",fontSize:11,padding:isDesktop?20:12}}>Geen taken voor vandaag{am&&<><br/><span style={{fontSize:9}}>Voeg taken toe via de lijst hiernaast</span></>}</div>
 :<>
 {dagStartNodig.length>0&&<div style={{fontSize:9,color:"#f87171",fontWeight:700,marginBottom:4}}>NODIG ({dagStartNodig.length})</div>}
-{dagStartNodig.map(t=><Tk key={t.id} t={t} sr={1}/>)}
+{dagStartNodig.map(t=><div key={t.id} style={{display:"flex",alignItems:"flex-start",gap:4}}>
+<div style={{flex:1}}><Tk t={t} sr={1}/></div>
+{am&&<button onClick={()=>{const n=dT.filter(x=>x!==t.id);sDT(n);updateDagstart(dB,n)}} style={{background:"none",border:"none",color:"#888",cursor:"pointer",fontSize:10,padding:"8px 2px",flexShrink:0}} title="Verwijder uit dagplanning">✕</button>}
+</div>)}
 {dagStartNice.length>0&&<div style={{fontSize:9,color:"#60a5fa",fontWeight:700,marginBottom:4,marginTop:8}}>NICE TO HAVE ({dagStartNice.length})</div>}
-{dagStartNice.map(t=><Tk key={t.id} t={t} sr={1}/>)}
+{dagStartNice.map(t=><div key={t.id} style={{display:"flex",alignItems:"flex-start",gap:4}}>
+<div style={{flex:1}}><Tk t={t} sr={1}/></div>
+{am&&<button onClick={()=>{const n=dT.filter(x=>x!==t.id);sDT(n);updateDagstart(dB,n)}} style={{background:"none",border:"none",color:"#888",cursor:"pointer",fontSize:10,padding:"8px 2px",flexShrink:0}} title="Verwijder uit dagplanning">✕</button>}
+</div>)}
 </>}
 </div>;
 
@@ -515,7 +546,7 @@ return wrap(<>
 </>)}
 
 // PERSON
-if(tb==="person"&&cP){const ptasks=T.filter(t=>t.w===cP.id);
+if(tb==="person"&&cP){const ptasks=T.filter(t=>tw(t).includes(cP.id));
   const byHouse={};ptasks.forEach(t=>{const h=DHs.find(x=>x.id===t.h);const key=h?h.n:"Onbekend";if(!byHouse[key])byHouse[key]=[];byHouse[key].push(t)});
   const done=ptasks.filter(t=>t.s==="completed").length;
   const ip=ptasks.filter(t=>t.s==="in_progress").length;
@@ -636,7 +667,7 @@ if(tb==="mile"){const today=new Date(TD);const sorted=[...M].sort((a,b)=>a.dl.lo
 
 // TEAM
 if(tb==="team"){const teamList=DBs.filter(b=>b.id!=="b0");
-const renderPerson=b=>{const d=T.filter(t=>t.w===b.id&&t.s==="completed").length,ip=T.filter(t=>t.w===b.id&&t.s==="in_progress").length;const isMe=U?.id===b.id;const isAdminB=b.p==="admin";
+const renderPerson=b=>{const d=T.filter(t=>tw(t).includes(b.id)&&t.s==="completed").length,ip=T.filter(t=>tw(t).includes(b.id)&&t.s==="in_progress").length;const isMe=U?.id===b.id;const isAdminB=b.p==="admin";
 return<div key={b.id} onClick={()=>{sCP(b);sTb("person")}} style={{...bx,display:"flex",alignItems:"center",justifyContent:"space-between",gap:6,padding:isDesktop?12:8,cursor:"pointer"}}>
 <div style={{display:"flex",alignItems:"center",gap:isDesktop?10:6,flex:1,minWidth:0}}><div style={{width:isDesktop?38:28,height:isDesktop?38:28,borderRadius:"50%",background:"#1a1a1a",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontSize:isDesktop?14:11,color:"#aaa",flexShrink:0}}>{b.n[0]}</div>
 <div style={{minWidth:0}}><div style={{fontSize:isDesktop?13:12,fontWeight:600}}>{b.n}{isMe&&<span style={{fontSize:9,color:"#bbb",marginLeft:4}}>(jij)</span>}</div><div style={{fontSize:isDesktop?11:9,color:"#999"}}>{b.r}</div></div>
@@ -730,7 +761,7 @@ return wrap(<>
 // HOME
 const tt=T.length,dn=T.filter(t=>t.s==="completed").length,ip=T.filter(t=>t.s==="in_progress").length,od=T.filter(t=>t.s!=="completed"&&t.dl&&t.dl<TD).length,tp=tt?Math.round(dn/tt*100):0;
 const roomsForHouse=qaF.h?R.filter(r=>r.h===qaF.h):[];
-const atFiltered=T.filter(t=>{if(atF.h!=="all"&&t.h!==atF.h)return 0;if(atF.s!=="all"&&t.s!==atF.s)return 0;if(atF.w!=="all"&&t.w!==atF.w)return 0;return 1});
+const atFiltered=T.filter(t=>{if(atF.h!=="all"&&t.h!==atF.h)return 0;if(atF.s!=="all"&&t.s!==atF.s)return 0;if(atF.w!=="all"){const ww=tw(t);if(atF.w===""?ww.length>0:!ww.includes(atF.w))return 0}return 1});
 
 const userHeader=<div style={{...bx,padding:6,marginBottom:8,display:"flex",alignItems:"center",gap:6,fontSize:10,color:"#999"}}><div style={{width:20,height:20,borderRadius:"50%",background:"#1a1a1a",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontSize:9,color:"#aaa"}}>{U.n[0]}</div>{U.n}<span style={{marginLeft:"auto",fontSize:8,padding:"1px 4px",borderRadius:3,background:"#1a1a1a",color:"#888"}}>{am?"admin":U.r}</span></div>;
 const aanwezigenToday=dB.length>0?DBs.filter(b=>dB.includes(b.id)):[];
@@ -763,7 +794,7 @@ const overdueList=od>0&&<div><div style={{fontSize:9,color:"#ef4444",fontWeight:
 const quickAdd=am&&<div style={{marginBottom:10}}>
 {!qa?<button onClick={()=>sQa(1)} style={{width:"100%",background:st.rd,color:"#fff",border:"none",borderRadius:8,padding:"10px 14px",cursor:"pointer",fontSize:13,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>+ Nieuwe taak</button>
 :<div style={{...bx,border:`1px solid ${st.rd}`,padding:10}}>
-<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}><span style={{fontSize:11,fontWeight:600}}>Nieuwe taak</span><button onClick={()=>{sQa(0);sQaF({h:"",r:"",ti:"",pr:"medium",c:"overig",w:"",dl:"",tp:"nodig",milestone_id:""})}} style={{background:"none",border:"none",color:"#bbb",cursor:"pointer",fontSize:14}}>✕</button></div>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}><span style={{fontSize:11,fontWeight:600}}>Nieuwe taak</span><button onClick={()=>{sQa(0);sQaF({h:"",r:"",ti:"",pr:"medium",c:"overig",w:[],dl:"",tp:"nodig",milestone_id:""})}} style={{background:"none",border:"none",color:"#bbb",cursor:"pointer",fontSize:14}}>✕</button></div>
 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:5,marginBottom:5}}>
 <select value={qaF.h} onChange={e=>sQaF({...qaF,h:e.target.value,r:""})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11}}><option value="">Kies huis…</option>{DHs.map(h=><option key={h.id} value={h.id}>{h.n}</option>)}</select>
 <select value={qaF.r} onChange={e=>sQaF({...qaF,r:e.target.value})} disabled={!qaF.h} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11,opacity:qaF.h?1:.5}}><option value="">Kies kamer…</option>{roomsForHouse.map(r=><option key={r.id} value={r.id}>{r.n}</option>)}</select>
@@ -774,12 +805,13 @@ const quickAdd=am&&<div style={{marginBottom:10}}>
 <select value={qaF.c} onChange={e=>sQaF({...qaF,c:e.target.value})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11}}>{CS.map(v=><option key={v}>{v}</option>)}</select>
 <select value={qaF.tp} onChange={e=>sQaF({...qaF,tp:e.target.value})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11}}><option value="nodig">Nodig</option><option value="nice">Nice</option></select>
 </div>
-<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:5,marginBottom:8}}>
-<select value={qaF.w} onChange={e=>sQaF({...qaF,w:e.target.value})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11}}><option value="">Toewijzen aan…</option>{DBs.map(b=><option key={b.id} value={b.id}>{b.n}</option>)}</select>
+<div style={{display:"grid",gridTemplateColumns:"1fr",gap:5,marginBottom:4}}>
 <input type="date" value={qaF.dl} onChange={e=>sQaF({...qaF,dl:e.target.value})} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11}}/>
 </div>
+<div style={{fontSize:9,color:"#999",marginBottom:3}}>Verantwoordelijken</div>
+<div style={{display:"flex",flexWrap:"wrap",gap:3,marginBottom:4}}>{DBs.filter(b=>b.id!=="b0").map(b=>{const sel=(qaF.w||[]).includes(b.id);return<button key={b.id} onClick={()=>{const cur=qaF.w||[];sQaF({...qaF,w:sel?cur.filter(x=>x!==b.id):[...cur,b.id]})}} style={{padding:"3px 7px",borderRadius:4,border:`1px solid ${sel?"#166534":"#333"}`,background:sel?"#0a1f0a":"#111",color:sel?"#4ade80":"#888",fontSize:9,cursor:"pointer"}}>{b.n}</button>})}</div>
 <select value={qaF.milestone_id||""} onChange={e=>sQaF({...qaF,milestone_id:e.target.value})} style={{width:"100%",background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:5,color:"#fff",fontSize:11,marginBottom:8,boxSizing:"border-box"}}><option value="">Geen mijlpaal</option>{M.map(m=><option key={m.id} value={m.id}>🎯 {m.n}</option>)}</select>
-<button onClick={async()=>{if(!qaF.h||!qaF.r||!qaF.ti)return;await addTask({id:"t"+Date.now(),r:qaF.r,h:qaF.h,ti:qaF.ti,s:"not_started",pr:qaF.pr,c:qaF.c,w:qaF.w,dl:qaF.dl,nt:"",tp:qaF.tp,sb:[],milestone_id:qaF.milestone_id||null});sQa(0);sQaF({h:"",r:"",ti:"",pr:"medium",c:"overig",w:"",dl:"",tp:"nodig",milestone_id:""})}} disabled={!qaF.h||!qaF.r||!qaF.ti} style={{...btn(st.gn,"#fff"),width:"100%",padding:"6px 10px",opacity:qaF.h&&qaF.r&&qaF.ti?1:.5,cursor:qaF.h&&qaF.r&&qaF.ti?"pointer":"not-allowed"}}>Taak toevoegen</button>
+<button onClick={async()=>{if(!qaF.h||!qaF.r||!qaF.ti)return;await addTask({id:"t"+Date.now(),r:qaF.r,h:qaF.h,ti:qaF.ti,s:"not_started",pr:qaF.pr,c:qaF.c,w:qaF.w||[],dl:qaF.dl||null,nt:"",tp:qaF.tp,sb:[],milestone_id:qaF.milestone_id||null});sQa(0);sQaF({h:"",r:"",ti:"",pr:"medium",c:"overig",w:[],dl:"",tp:"nodig",milestone_id:""})}} disabled={!qaF.h||!qaF.r||!qaF.ti} style={{...btn(st.gn,"#fff"),width:"100%",padding:"6px 10px",opacity:qaF.h&&qaF.r&&qaF.ti?1:.5,cursor:qaF.h&&qaF.r&&qaF.ti?"pointer":"not-allowed"}}>Taak toevoegen</button>
 </div>}
 </div>;
 
@@ -792,13 +824,13 @@ const allTasksList=am&&<div>
 </div>
 <div style={{maxHeight:isDesktop?500:"none",overflowY:isDesktop?"auto":"visible"}}>
 {atFiltered.length===0?<div style={{...bx,textAlign:"center",color:"#888",fontSize:10,padding:10}}>Geen taken met deze filters</div>
-:atFiltered.map(t=>{const r=R.find(x=>x.id===t.r),h=DHs.find(x=>x.id===t.h),a=DBs.find(b=>b.id===t.w),od=t.s!=="completed"&&t.dl&&t.dl<TD;
+:atFiltered.map(t=>{const r=R.find(x=>x.id===t.r),h=DHs.find(x=>x.id===t.h),ww=tw(t).map(id=>DBs.find(b=>b.id===id)).filter(Boolean),od=t.s!=="completed"&&t.dl&&t.dl<TD;
 return<div key={t.id} onClick={()=>{sCH(h);sCR(r)}} style={{...bx,cursor:"pointer",padding:7,display:"flex",alignItems:"center",gap:6,borderColor:od?"#7f1d1d":"#222"}}>
 <span style={{fontSize:14,color:t.s==="completed"?"#4ade80":t.s==="in_progress"?"#facc15":"#555"}}>{t.s==="completed"?"✅":t.s==="in_progress"?"🔄":"⭕"}</span>
 <div style={{flex:1,minWidth:0}}>
 <div style={{fontSize:11,fontWeight:500,color:t.s==="completed"?"#444":"#fff",textDecoration:t.s==="completed"?"line-through":"none"}}>{t.ti}</div>
 <div style={{fontSize:9,color:"#999",display:"flex",gap:5,flexWrap:"wrap"}}>
-<span>🏠{h?.n}→{r?.n}</span>{a&&<span>👤{a.n}</span>}{t.dl&&<span style={{color:od?"#ef4444":""}}>📅{t.dl}</span>}
+<span>🏠{h?.n}→{r?.n}</span>{ww.length>0&&<span>👤{ww.map(b=>b.n).join(", ")}</span>}{t.dl&&<span style={{color:od?"#ef4444":""}}>📅{t.dl}</span>}
 <span style={{padding:"0 4px",borderRadius:3,background:t.tp==="nodig"?"#1a0505":"#05051a",color:t.tp==="nodig"?"#f87171":"#60a5fa"}}>{t.tp}</span>
 </div>
 </div>
