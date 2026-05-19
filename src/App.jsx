@@ -7,6 +7,7 @@ const hashPin = async (pin) => {
   return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 };
 const tw=t=>Array.isArray(t.w)?t.w:t.w?[t.w]:[];
+const rMatch=(t,u)=>{if(!u||u.p==="admin")return true;if(tw(t).includes(u.id))return true;const r=u.r;if(t.c===r)return true;if(r==="bouw"&&"ruwbouw,decoratie".includes(t.c))return true;if(r==="deco"&&t.c==="decoratie")return true;return false};
 
 const DB=[{id:"b1",n:"Ron",r:"bouw",p:"admin"},{id:"b2",n:"Remco",r:"bouw",p:"bouw"},{id:"b3",n:"Sim",r:"deco",p:"decoratie"},{id:"b4",n:"Ricardo",r:"bouw",p:"bouw"},{id:"b5",n:"Koen L",r:"techniek",p:"techniek"},{id:"b6",n:"Jeroen",r:"techniek",p:"techniek"},{id:"b7",n:"Sanna",r:"deco",p:"decoratie"},{id:"b8",n:"Bart",r:"ict",p:"admin"},{id:"b0",n:"Alec",r:"admin",p:"admin"}];
 const DH=[{id:"h1",n:"Hail Mary Hospital",d:"Update in loods",l:"loods",ld:"b1",dl:"2026-11-01"},{id:"h2",n:"Huckabay Highstreet",d:"Update in loods",l:"loods",ld:"b4",dl:"2026-11-01"},{id:"h3",n:"The Barn",d:"Nieuw in tent",l:"tent",ld:"b1",dl:"2026-11-08"},{id:"h4",n:"The Mine",d:"Nieuw in tent",l:"tent",ld:"b4",dl:"2026-11-08"},{id:"h5",n:"The Woods",d:"Bosroute",l:"bos",ld:"b3",dl:"2026-11-08"}];
@@ -42,11 +43,13 @@ const[DHs,sDHs]=useState([]);
 const[lS,sLS]=useState(null);const[lU,sLU]=useState(null);const[lP,sLP]=useState("");const[lP2,sLP2]=useState("");const[lE,sLE]=useState("");const[lN,sLN]=useState("");
 const[shT,sShT]=useState({});
 const[shM,sShM]=useState({});
-const[dQa,sDQa]=useState(0);const[dQaF,sDQaF]=useState({h:"",r:"",ti:"",w:""});
+const[dQa,sDQa]=useState(0);const[dQaF,sDQaF]=useState({h:"",r:"",ti:"",w:[]});
 const[matF,sMatF]=useState("all");
 const[nMat,sNMat]=useState({n:"",q:1,s:"nodig",rooms:[]});const[nMatO,sNMatO]=useState(0);
 const[dagQ,sDagQ]=useState("");
 const[dagW,sDagW]=useState(null);const[dagWp,sDagWp]=useState("");
+const[cTk,sCTk]=useState(null);
+const[rolF,sRolF]=useState(1);
 
 useEffect(()=>{
   (async()=>{
@@ -72,6 +75,24 @@ useEffect(()=>{
   })();
 },[]);
 useEffect(()=>{const h=()=>sW(window.innerWidth);window.addEventListener("resize",h);return()=>window.removeEventListener("resize",h)},[]);
+
+// Terug-knop telefoon
+useEffect(()=>{window.history.replaceState({app:1},"")},[]);
+useEffect(()=>{
+  window.history.pushState({app:1},"");
+  const onBack=(e)=>{
+    e.preventDefault();
+    if(cTk){sCTk(null)}
+    else if(cR){sCR(null)}
+    else if(cH){sCH(null)}
+    else if(cP){sCP(null);sTb("team")}
+    else if(tb!=="home"){sTb("home")}
+    else{window.history.pushState({app:1},"");return}
+    window.history.pushState({app:1},"");
+  };
+  window.addEventListener("popstate",onBack);
+  return()=>window.removeEventListener("popstate",onBack);
+},[tb,cH,cR,cP,cTk]);
 const uT=n=>{sT(n)};
 const addTask=async(t)=>{const saved=await saveTask(t);console.log("addTask result:",saved);if(saved)sT([...T,saved])};
 const updateTask=async(t)=>{const saved=await saveTask(t);if(saved)sT(T.map(x=>x.id===t.id?saved:x))};
@@ -192,7 +213,7 @@ if(eI===t.id)return<div style={{...bx,border:"1px solid #dc2626"}}><input value=
 return<div style={{...bx,padding:7,marginBottom:4,borderColor:od?"#7f1d1d":t.tp==="nice"?"#1e3a5f":"#222"}}>
 <div style={{display:"flex",alignItems:"center",gap:6}}>
 <button onClick={()=>{if(!ed)return;const ns=t.s==="completed"?"not_started":t.s==="in_progress"?"completed":"in_progress";updateTask({...t,s:ns})}} style={{background:"none",border:"none",cursor:ed?"pointer":"default",padding:0,fontSize:16,flexShrink:0}}>{t.s==="completed"?"✅":t.s==="in_progress"?"🔄":"⭕"}</button>
-<div style={{flex:1,minWidth:0}}>
+<div style={{flex:1,minWidth:0,cursor:"pointer"}} onClick={()=>sCTk(t)}>
 <div style={{fontSize:12,fontWeight:500,color:t.s==="completed"?"#888":"#fff",textDecoration:t.s==="completed"?"line-through":"none"}}>{t.ti}{sr&&rm&&ho&&<span style={{fontSize:9,color:"#999",fontWeight:400,marginLeft:5}}>· {ho.n}→{rm.n}</span>}</div>
 <div style={{fontSize:9,color:"#bbb",display:"flex",gap:5,flexWrap:"wrap",marginTop:1}}>
 <span style={{padding:"1px 4px",borderRadius:3,background:t.pr==="critical"?"#7f1d1d":t.pr==="high"?"#854d0e":"#1a1a1a",color:t.pr==="critical"?"#fff":t.pr==="high"?"#fde047":"#ccc"}}>{t.pr}</span>
@@ -231,6 +252,66 @@ return<div style={{...bx,padding:7,marginBottom:4,borderColor:od?"#7f1d1d":t.tp=
 </div>};
 
 
+
+// TASK DETAIL
+if(cTk){const t=T.find(x=>x.id===cTk.id)||cTk,rm=R.find(x=>x.id===t.r),ho=DHs.find(x=>x.id===t.h),ed=cE(U,t.c),wIds=tw(t),wNames=wIds.map(id=>DBs.find(b=>b.id===id)).filter(Boolean),od=t.s!=="completed"&&t.dl&&t.dl<TD,mile=t.milestone_id?M.find(x=>x.id===t.milestone_id):null,subs=(t.sb||[]),sdone=subs.filter(x=>x.d).length,roomMat=(rm?.mt||[]);
+return wrap(<>
+<button onClick={()=>sCTk(null)} style={{background:"none",border:"none",color:"#bbb",fontSize:11,cursor:"pointer",padding:0,marginBottom:isDesktop?14:6}}>← Terug</button>
+<div style={{display:isDesktop?"grid":"block",gridTemplateColumns:"1.5fr 1fr",gap:20,alignItems:"start"}}>
+<div>
+<div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+<button onClick={()=>{if(!ed)return;const ns=t.s==="completed"?"not_started":t.s==="in_progress"?"completed":"in_progress";updateTask({...t,s:ns})}} style={{background:"none",border:"none",cursor:ed?"pointer":"default",padding:0,fontSize:24,flexShrink:0}}>{t.s==="completed"?"✅":t.s==="in_progress"?"🔄":"⭕"}</button>
+<div>
+<h1 style={{fontSize:isDesktop?22:17,fontWeight:700,margin:0,color:t.s==="completed"?"#888":"#fff",textDecoration:t.s==="completed"?"line-through":"none"}}>{t.ti}</h1>
+<div style={{fontSize:10,color:"#999",marginTop:2}}>{ho?.n} → {rm?.n}</div>
+</div>
+</div>
+
+<div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:isDesktop?14:10}}>
+<span style={{fontSize:10,padding:"3px 8px",borderRadius:4,background:t.pr==="critical"?"#7f1d1d":t.pr==="high"?"#854d0e":"#1a1a1a",color:t.pr==="critical"?"#fff":t.pr==="high"?"#fde047":"#ccc"}}>{t.pr}</span>
+<span style={{fontSize:10,padding:"3px 8px",borderRadius:4,background:"#1a1a1a",color:"#ccc"}}>{t.c}</span>
+<span style={{fontSize:10,padding:"3px 8px",borderRadius:4,background:t.tp==="nodig"?"#1a0505":"#05051a",color:t.tp==="nodig"?"#f87171":"#60a5fa"}}>{t.tp||"nodig"}</span>
+{t.dl&&<span style={{fontSize:10,padding:"3px 8px",borderRadius:4,background:od?"#1a0505":"#1a1a1a",color:od?"#ef4444":"#ccc"}}>📅 {t.dl}</span>}
+{mile&&<span style={{fontSize:10,padding:"3px 8px",borderRadius:4,background:"#1a1a2e",color:"#a78bfa"}}>🎯 {mile.n}</span>}
+</div>
+
+{t.nt&&<div style={{...bx,padding:10,marginBottom:isDesktop?14:10,background:"#1a1500",border:"1px solid #433"}}>
+<div style={{fontSize:9,color:"#999",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:4}}>Notitie</div>
+<div style={{fontSize:12,color:"#ca8a04",lineHeight:1.4}}>{t.nt}</div>
+</div>}
+
+<div style={{marginBottom:isDesktop?14:10}}>
+<div style={{fontSize:9,color:"#999",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>Subtaken ({sdone}/{subs.length})</div>
+{subs.length===0?<div style={{fontSize:10,color:"#888",padding:"4px 0"}}>Geen subtaken</div>
+:subs.map(s=><div key={s.id} style={{display:"flex",alignItems:"center",gap:6,padding:"4px 0"}}>
+<button onClick={()=>{if(!ed)return;const nsb=subs.map(x=>x.id===s.id?{...x,d:!x.d}:x);updateTask({...t,sb:nsb})}} style={{background:"none",border:"none",cursor:ed?"pointer":"default",padding:0,fontSize:14}}>{s.d?"☑":"☐"}</button>
+<span style={{fontSize:12,color:s.d?"#888":"#ccc",textDecoration:s.d?"line-through":"none"}}>{s.ti}</span>
+</div>)}
+</div>
+
+{ed&&<button onClick={()=>{sEF({ti:t.ti,pr:t.pr,c:t.c,w:tw(t),dl:t.dl,nt:t.nt,tp:t.tp,milestone_id:t.milestone_id||""});sEI(t.id);sCTk(null)}} style={{...btn(st.rd,"#fff"),padding:"8px 14px",fontSize:12}}>✏️ Bewerken</button>}
+</div>
+
+<div style={{display:"flex",flexDirection:"column",gap:isDesktop?14:10,...(isDesktop?{position:"sticky",top:20}:{}),marginTop:isDesktop?0:14}}>
+<div>
+<div style={{fontSize:9,color:"#999",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>Verantwoordelijken ({wNames.length})</div>
+{wNames.length===0?<div style={{fontSize:10,color:"#888"}}>Niet toegewezen</div>
+:<div style={{display:"flex",flexWrap:"wrap",gap:5}}>{wNames.map(b=><div key={b.id} onClick={()=>{sCP(b);sTb("person");sCTk(null)}} style={{display:"flex",alignItems:"center",gap:5,padding:"5px 10px",background:"#1a1a1a",borderRadius:6,fontSize:11,color:"#ccc",cursor:"pointer"}}><div style={{width:22,height:22,borderRadius:"50%",background:"#222",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:"#aaa"}}>{b.n[0]}</div>{b.n}</div>)}</div>}
+</div>
+
+{roomMat.length>0&&<div>
+<div style={{fontSize:9,color:"#999",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>Materialen in {rm?.n} ({roomMat.length})</div>
+{roomMat.map((m,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:6,...bx,padding:6}}>
+<span style={{fontSize:11,flex:1,color:"#aaa"}}>{m.n||"—"}</span>
+<span style={{fontSize:10,color:"#aaa"}}>×{m.q}</span>
+<span style={{fontSize:9,padding:"2px 6px",borderRadius:4,background:m.s==="aanwezig"?"#0a1f0a":m.s==="besteld"?"#1a1500":"#1a0505",color:m.s==="aanwezig"?"#4ade80":m.s==="besteld"?"#facc15":"#f87171"}}>{m.s}</span>
+</div>)}
+</div>}
+
+<button onClick={()=>{sCTk(null);sCH(ho);sCR(rm)}} style={{...bx,cursor:"pointer",textAlign:"center",fontSize:11,color:"#bbb",padding:10}}>📍 Ga naar {ho?.n} → {rm?.n}</button>
+</div>
+</div>
+</>)}
 
 // ROOM
 if(cR){const rm=cR,ho=DHs.find(x=>x.id===rm.h),rt=T.filter(t=>t.r===rm.id),pr=rP(rm.id,T);
@@ -673,6 +754,8 @@ return<div key={b.id} onClick={()=>{sCP(b);sTb("person")}} style={{...bx,display
 <div style={{minWidth:0}}><div style={{fontSize:isDesktop?13:12,fontWeight:600}}>{b.n}{isMe&&<span style={{fontSize:9,color:"#bbb",marginLeft:4}}>(jij)</span>}</div><div style={{fontSize:isDesktop?11:9,color:"#999"}}>{b.r}</div></div>
 </div>
 <span style={{fontSize:isDesktop?11:10,whiteSpace:"nowrap"}}><span style={{color:"#4ade80"}}>{d}✓</span> <span style={{color:"#facc15"}}>{ip}⏳</span></span>
+{am&&!isMe&&<select value={b.r} onClick={e=>e.stopPropagation()} onChange={async e=>{e.stopPropagation();const newR=e.target.value;const newP=isAdminB?"admin":newR;await updatePerson({...b,r:newR,p:newP})}} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:"3px 5px",color:"#bbb",fontSize:9,cursor:"pointer"}}>
+{["bouw","decoratie","techniek","kleding","grime","marketing","algemeen"].map(r=><option key={r} value={r}>{r}</option>)}</select>}
 {am&&<button onClick={async e=>{e.stopPropagation();if(isMe){alert("Je kunt je eigen admin-rechten niet aanpassen.");return}const newP=isAdminB?b.r:"admin";await updatePerson({...b,p:newP})}} disabled={isMe} style={{padding:"4px 8px",borderRadius:4,border:`1px solid ${isAdminB?"#7f1d1d":"#333"}`,background:isAdminB?"#1a0505":"#111",color:isAdminB?"#fca5a5":"#bbb",fontSize:9,cursor:isMe?"not-allowed":"pointer",opacity:isMe?.4:1,whiteSpace:"nowrap"}} title={isMe?"Je kunt jezelf niet de-adminnen":isAdminB?"Klik om admin-rechten in te trekken":"Klik om admin te maken"}>{isAdminB?"Admin ✓":"Maak admin"}</button>}
 {am&&!isMe&&b.pin_hash&&<button onClick={async e=>{e.stopPropagation();if(!confirm(`Pincode van ${b.n} resetten? Ze moeten dan een nieuwe instellen.`))return;const updated={...b,pin_hash:null};const saved=await savePerson(updated);if(saved)sDBs(DBs.map(x=>x.id===saved.id?saved:x))}} style={{padding:"4px 8px",borderRadius:4,border:"1px solid #333",background:"#111",color:"#bbb",fontSize:9,cursor:"pointer",whiteSpace:"nowrap"}} title="Pin resetten">🔑</button>}
 {am&&!isMe&&<button onClick={async e=>{e.stopPropagation();if(!confirm(`${b.n} verwijderen uit het team?`))return;await removePerson(b.id)}} style={{background:"none",border:"none",color:"#bbb",cursor:"pointer",fontSize:14,padding:2}} title="Verwijderen">🗑</button>}
@@ -759,11 +842,19 @@ return wrap(<>
 
 
 // HOME
-const tt=T.length,dn=T.filter(t=>t.s==="completed").length,ip=T.filter(t=>t.s==="in_progress").length,od=T.filter(t=>t.s!=="completed"&&t.dl&&t.dl<TD).length,tp=tt?Math.round(dn/tt*100):0;
+const fT=!am&&rolF?T.filter(t=>rMatch(t,U)):T;
+const tt=fT.length,dn=fT.filter(t=>t.s==="completed").length,ip=fT.filter(t=>t.s==="in_progress").length,od=fT.filter(t=>t.s!=="completed"&&t.dl&&t.dl<TD).length,tp=tt?Math.round(dn/tt*100):0;
+const myTasks=!am?T.filter(t=>tw(t).includes(U.id)&&t.s!=="completed"):[];
 const roomsForHouse=qaF.h?R.filter(r=>r.h===qaF.h):[];
 const atFiltered=T.filter(t=>{if(atF.h!=="all"&&t.h!==atF.h)return 0;if(atF.s!=="all"&&t.s!==atF.s)return 0;if(atF.w!=="all"){const ww=tw(t);if(atF.w===""?ww.length>0:!ww.includes(atF.w))return 0}return 1});
 
 const userHeader=<div style={{...bx,padding:6,marginBottom:8,display:"flex",alignItems:"center",gap:6,fontSize:10,color:"#999"}}><div style={{width:20,height:20,borderRadius:"50%",background:"#1a1a1a",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontSize:9,color:"#aaa"}}>{U.n[0]}</div>{U.n}<span style={{marginLeft:"auto",fontSize:8,padding:"1px 4px",borderRadius:3,background:"#1a1a1a",color:"#888"}}>{am?"admin":U.r}</span></div>;
+const rolToggle=!am&&<button onClick={()=>sRolF(f=>f?0:1)} style={{...bx,cursor:"pointer",textAlign:"center",fontSize:10,padding:"6px 10px",marginBottom:10,color:rolF?"#4ade80":"#888",border:`1px solid ${rolF?"#166534":"#333"}`,background:rolF?"#0a1f0a":"#111"}}>{rolF?`🔍 Gefilterd op: ${U.r}`:"👁 Alles tonen"}</button>;
+const myTasksBlock=!am&&myTasks.length>0&&<div style={{marginBottom:10}}>
+<div style={{fontSize:9,color:st.rd,fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>Jouw taken ({myTasks.length})</div>
+{myTasks.slice(0,isDesktop?8:5).map(t=><Tk key={t.id} t={t} sr={1}/>)}
+{myTasks.length>(isDesktop?8:5)&&<div style={{fontSize:9,color:"#888",textAlign:"center",padding:4}}>+{myTasks.length-(isDesktop?8:5)} meer…</div>}
+</div>;
 const aanwezigenToday=dB.length>0?DBs.filter(b=>dB.includes(b.id)):[];
 const aanwezigenBlock=aanwezigenToday.length>0?<div style={{...bx,padding:isDesktop?10:8,marginBottom:10}}>
 <div style={{fontSize:9,color:"#bbb",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:6}}>☀ Aanwezig vandaag ({aanwezigenToday.length})</div>
@@ -777,16 +868,17 @@ const statsGrid=cols=><div style={{display:"grid",gridTemplateColumns:`repeat(${
 {[{l:"Voortgang",v:tp+"%",c:st.rd},{l:"Afgerond",v:dn+"/"+tt,c:st.gn},{l:"Bezig",v:ip,c:st.yw},{l:"Achterstand",v:od,c:od?"#ef4444":"#333"}].map((x,i)=>
 <div key={i} style={{...bx,textAlign:"center",padding:isDesktop?10:6}}><div style={{fontSize:isDesktop?10:8,color:"#999"}}>{x.l}</div><div style={{fontSize:isDesktop?22:16,fontWeight:700,color:x.c}}>{x.v}</div></div>)}</div>;
 
+const fHouses=!am&&rolF?DHs.filter(h=>fT.some(t=>t.h===h.id)):DHs;
 const housesList=<>
-<div style={{fontSize:9,color:"#999",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>Huizen ({DHs.length})</div>
-{DHs.map(h=>{const pr=hP(h.id,T),ht=T.filter(t=>t.h===h.id),hd=ht.filter(t=>t.s==="completed").length;
+<div style={{fontSize:9,color:"#999",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>Huizen ({fHouses.length})</div>
+{fHouses.map(h=>{const pr=hP(h.id,fT),ht=fT.filter(t=>t.h===h.id),hd=ht.filter(t=>t.s==="completed").length;
 return<button key={h.id} onClick={()=>sCH(h)} style={{width:"100%",...bx,borderRadius:10,padding:isDesktop?14:10,cursor:"pointer",textAlign:"left",color:"#fff"}}>
 <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}><span style={{fontSize:isDesktop?15:13,fontWeight:700}}>{h.n}</span><span style={{fontSize:9,padding:"2px 6px",borderRadius:6,background:{loods:"#1e3a5f",tent:"#3b1f5e",bos:"#1a3a2a"}[h.l],color:"#bbb"}}>{h.l}</span></div>
 <div style={{display:"flex",gap:8,fontSize:10,color:"#999",marginBottom:5}}>🏠 {R.filter(r=>r.h===h.id).length} kamers · 📋 {hd}/{ht.length} taken · 📅 {h.dl}</div>
 <div style={{display:"flex",alignItems:"center",gap:6}}><div style={{flex:1,height:5,background:"#1a1a1a",borderRadius:2,overflow:"hidden"}}><div style={{height:"100%",background:pr===100?st.gn:st.rd,width:`${pr}%`}}/></div><span style={{fontSize:11,fontWeight:700,color:pr===100?st.gn:st.rd}}>{pr}%</span></div></button>})}</>;
 
 const overdueList=od>0&&<div><div style={{fontSize:9,color:"#ef4444",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>⚠ Achterstand ({od})</div>
-{T.filter(t=>t.s!=="completed"&&t.dl&&t.dl<TD).slice(0,isDesktop?8:3).map(t=>{const r=R.find(x=>x.id===t.r),h=DHs.find(x=>x.id===t.h);return<div key={t.id} onClick={()=>{sCH(h);sCR(r)}} style={{background:"#1a0505",border:"1px solid #7f1d1d",borderRadius:6,padding:6,marginBottom:3,cursor:"pointer"}}>
+{fT.filter(t=>t.s!=="completed"&&t.dl&&t.dl<TD).slice(0,isDesktop?8:3).map(t=>{const r=R.find(x=>x.id===t.r),h=DHs.find(x=>x.id===t.h);return<div key={t.id} onClick={()=>{sCH(h);sCR(r)}} style={{background:"#1a0505",border:"1px solid #7f1d1d",borderRadius:6,padding:6,marginBottom:3,cursor:"pointer"}}>
 <div style={{fontSize:10,color:"#fca5a5",fontWeight:500}}>{t.ti}</div>
 <div style={{display:"flex",justifyContent:"space-between",fontSize:9,color:"#ef4444",marginTop:2}}><span>{h?.n} → {r?.n}</span><span>{t.dl}</span></div>
 </div>})}</div>;
@@ -844,17 +936,22 @@ if(isDesktop)return wrap(<>
 <div><h1 style={{fontSize:22,fontWeight:700,margin:0}}>🎃 Horror Zone Dashboard</h1><p style={{fontSize:11,color:"#999",marginTop:4}}>{new Date().toLocaleDateString("nl-NL",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</p></div>
 <div style={{fontSize:11,color:"#bbb"}}>Welkom, {U.n} <span style={{fontSize:9,padding:"2px 6px",borderRadius:3,background:"#1a1a1a",color:"#bbb",marginLeft:6}}>{am?"admin":U.r}</span></div>
 </div>
-<div style={{display:"grid",gridTemplateColumns:am?"1.6fr 1fr":"1fr",gap:20,alignItems:"start"}}>
+{rolToggle}
+<div style={{display:"grid",gridTemplateColumns:am?"1.6fr 1fr":myTasks.length>0?"1.5fr 1fr":"1fr",gap:20,alignItems:"start"}}>
 <div>
 {aanwezigenBlock}
 {statsGrid(4)}
 {housesList}
 {!am&&overdueList&&<div style={{marginTop:14}}>{overdueList}</div>}
 </div>
-{am&&<div style={{position:"sticky",top:20}}>
+{am?<div style={{position:"sticky",top:20}}>
 {quickAdd}
 {overdueList&&<div style={{marginBottom:14}}>{overdueList}</div>}
 {allTasksList}
+</div>
+:myTasks.length>0&&<div style={{position:"sticky",top:20}}>
+{myTasksBlock}
+{overdueList&&<div style={{marginTop:14}}>{overdueList}</div>}
 </div>}
 </div>
 </>);
@@ -862,7 +959,9 @@ if(isDesktop)return wrap(<>
 return wrap(<>
 <h1 style={{fontSize:17,fontWeight:700}}>🎃 Horror Zone</h1><p style={{fontSize:10,color:"#999",marginBottom:6}}>{new Date().toLocaleDateString("nl-NL",{weekday:"short",day:"numeric",month:"short"})}</p>
 {userHeader}
+{rolToggle}
 {aanwezigenBlock}
+{myTasksBlock}
 {quickAdd}
 {statsGrid(2)}
 {housesList}
