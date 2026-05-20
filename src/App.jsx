@@ -181,7 +181,7 @@ return loginWrap(<>
 }
 const isDesktop=w>=768;
 const nav=()=><div style={{display:"flex",background:"#0a0a0a",borderTop:"1px solid #1a1a1a",padding:"6px 2px",position:"fixed",bottom:0,left:0,right:0,zIndex:100}}>
-{[["home","🏠","Home"],["search","🔍","Zoek"],["dag","☀️","Dag"],["mile","🎯","Mijlp"],["team","👥","Team"],...(am?[["mat","📦","Mater."]]:[])]
+{[["home","🏠","Home"],["search","🔍","Zoek"],["dag","☀️","Dag"],["mile","🎯","Mijlp"],["team","👥","Team"],["mat","📦","Mater."]]
 .map(([id,ic,lb])=>
 <button key={id} onClick={()=>{sTb(id);sCH(null);sCR(null)}} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:1,background:"none",border:"none",cursor:"pointer",padding:"3px 0",color:tb===id?"#dc2626":"#444",fontSize:14}}><span>{ic}</span><span style={{fontSize:8,fontWeight:600}}>{lb}</span></button>)}
 <button onClick={()=>{sU(null);S("zu",null)}} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1,background:"none",border:"none",cursor:"pointer",padding:"3px 6px",color:"#888",fontSize:14}}><span>↩</span><span style={{fontSize:8}}>Uit</span></button></div>;
@@ -195,7 +195,7 @@ const sideNav=()=><div style={{width:200,background:"#0a0a0a",borderRight:"1px s
 <div style={{fontSize:18,fontWeight:700,color:"#dc2626"}}>🎃 Horror Zone</div>
 <div style={{fontSize:10,color:"#999",marginTop:2}}>{U?.n}</div>
 </div>
-{[["home","🏠","Home"],["search","🔍","Zoeken"],["dag","☀️","Dagstart"],["mile","🎯","Mijlpalen"],["team","👥","Team"],...(am?[["mat","📦","Materialen"]]:[])]
+{[["home","🏠","Home"],["search","🔍","Zoeken"],["dag","☀️","Dagstart"],["mile","🎯","Mijlpalen"],["team","👥","Team"],["mat","📦","Materialen"]]
 .map(([id,ic,lb])=>
 <button key={id} onClick={()=>{sTb(id);sCH(null);sCR(null)}} style={{display:"flex",alignItems:"center",gap:10,background:tb===id?"#1a1a1a":"none",border:"none",cursor:"pointer",padding:"10px 12px",color:tb===id?"#dc2626":"#888",fontSize:13,borderRadius:6,textAlign:"left",fontWeight:tb===id?600:400}}>
 <span style={{fontSize:16}}>{ic}</span><span>{lb}</span></button>)}
@@ -814,10 +814,12 @@ return wrap(<>
 </>)}
 
 // MATERIALEN OVERZICHT
-if(tb==="mat"&&am){
-const allMat=[];R.forEach(r=>{const h=DHs.find(x=>x.id===r.h);(r.mt||[]).forEach((m,i)=>allMat.push({...m,_ri:r.id,_i:i,_rn:r.n,_hn:h?.n||"?",_room:r}))});
+if(tb==="mat"){
+const canERm=(room)=>{const rt=T.filter(t=>t.r===room.id);return am||(room.cr||[]).includes(U?.id)||rt.some(t=>cE(U,t.c,t))};
+const allMat=[];R.forEach(r=>{const h=DHs.find(x=>x.id===r.h);(r.mt||[]).forEach((m,i)=>allMat.push({...m,_ri:r.id,_i:i,_rn:r.n,_hn:h?.n||"?",_room:r,_canEdit:canERm(r)}))});
 const mNodig=allMat.filter(m=>m.s==="nodig").length,mBesteld=allMat.filter(m=>m.s==="besteld").length,mAanwezig=allMat.filter(m=>m.s==="aanwezig").length;
 const filtered=matF==="all"?allMat:allMat.filter(m=>m.s===matF);
+const hasAnyEdit=allMat.some(m=>m._canEdit)||am;
 
 // Groepeer op materiaalnaam (case-insensitive)
 const byName={};filtered.forEach(m=>{const key=(m.n||"").toLowerCase().trim()||"_leeg_"+m._ri+"_"+m._i;if(!byName[key])byName[key]={n:m.n,items:[]};byName[key].items.push(m)});
@@ -825,6 +827,7 @@ const matNames=Object.values(byName).sort((a,b)=>(a.n||"").localeCompare(b.n||""
 
 const updMatO=async(room,newMt)=>{const up={...room,mt:newMt};await updateRoom(up)};
 const addMatToRooms=async()=>{const naam=nMat.n.trim();if(!naam||nMat.rooms.length===0)return;for(const rid of nMat.rooms){const room=R.find(x=>x.id===rid);if(room){const newMt=[...(room.mt||[]),{n:naam,q:nMat.q,s:nMat.s}];await updMatO(room,newMt)}}sNMat({n:"",q:1,s:"nodig",rooms:[]});sNMatO(0)};
+const editableRooms=R.filter(r=>canERm(r));
 
 return wrap(<>
 <h1 style={{fontSize:isDesktop?22:17,fontWeight:700,marginBottom:isDesktop?14:8}}>📦 Materialen</h1>
@@ -834,7 +837,7 @@ return wrap(<>
 <button key={x.f} onClick={()=>sMatF(matF===x.f?"all":x.f)} style={{...bx,textAlign:"center",padding:isDesktop?10:6,cursor:"pointer",border:`1px solid ${matF===x.f?x.c:st.bd}`,color:"#fff"}}><div style={{fontSize:isDesktop?10:8,color:"#999"}}>{x.l}</div><div style={{fontSize:isDesktop?22:16,fontWeight:700,color:x.c}}>{x.v}</div></button>)}
 </div>
 
-{!nMatO?<button onClick={()=>sNMatO(1)} style={{width:"100%",background:st.rd,color:"#fff",border:"none",borderRadius:8,padding:"8px 12px",cursor:"pointer",fontSize:12,fontWeight:600,marginBottom:isDesktop?14:10}}>+ Nieuw materiaal toevoegen</button>
+{editableRooms.length>0&&(!nMatO?<button onClick={()=>sNMatO(1)} style={{width:"100%",background:st.rd,color:"#fff",border:"none",borderRadius:8,padding:"8px 12px",cursor:"pointer",fontSize:12,fontWeight:600,marginBottom:isDesktop?14:10}}>+ Nieuw materiaal toevoegen</button>
 :<div style={{...bx,border:`1px solid ${st.rd}`,padding:12,marginBottom:isDesktop?14:10}}>
 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}><span style={{fontSize:12,fontWeight:600}}>Nieuw materiaal</span><button onClick={()=>{sNMatO(0);sNMat({n:"",q:1,s:"nodig",rooms:[]})}} style={{background:"none",border:"none",color:"#bbb",cursor:"pointer",fontSize:14}}>✕</button></div>
 <div style={{display:"grid",gridTemplateColumns:"2fr 1fr 1fr",gap:5,marginBottom:8}}>
@@ -845,10 +848,10 @@ return wrap(<>
 </div>
 <div style={{fontSize:9,color:"#999",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>Toevoegen aan kamers</div>
 <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:8}}>
-{R.map(r=>{const h=DHs.find(x=>x.id===r.h);const sel=nMat.rooms.includes(r.id);return<button key={r.id} onClick={()=>{const rooms=sel?nMat.rooms.filter(x=>x!==r.id):[...nMat.rooms,r.id];sNMat({...nMat,rooms})}} style={{padding:"4px 8px",borderRadius:6,border:`1px solid ${sel?"#166534":"#333"}`,background:sel?"#0a1f0a":"#111",color:sel?"#4ade80":"#888",fontSize:10,cursor:"pointer"}}>{h?.n} → {r.n}</button>})}
+{editableRooms.map(r=>{const h=DHs.find(x=>x.id===r.h);const sel=nMat.rooms.includes(r.id);return<button key={r.id} onClick={()=>{const rooms=sel?nMat.rooms.filter(x=>x!==r.id):[...nMat.rooms,r.id];sNMat({...nMat,rooms})}} style={{padding:"4px 8px",borderRadius:6,border:`1px solid ${sel?"#166534":"#333"}`,background:sel?"#0a1f0a":"#111",color:sel?"#4ade80":"#888",fontSize:10,cursor:"pointer"}}>{h?.n} → {r.n}</button>})}
 </div>
 <button onClick={addMatToRooms} disabled={!nMat.n.trim()||nMat.rooms.length===0} style={{...btn(st.gn,"#fff"),width:"100%",padding:"8px 10px",opacity:nMat.n.trim()&&nMat.rooms.length>0?1:.5,cursor:nMat.n.trim()&&nMat.rooms.length>0?"pointer":"not-allowed"}}>Toevoegen aan {nMat.rooms.length} kamer{nMat.rooms.length!==1?"s":""}</button>
-</div>}
+</div>)}
 
 {matNames.length===0?<div style={{...bx,textAlign:"center",color:"#888",fontSize:11,padding:20}}>Geen materialen{matF!=="all"&&` met status "${matF}"`}</div>
 :matNames.map(({n:matNaam,items})=><div key={matNaam||"leeg"} style={{...bx,padding:10,marginBottom:6}}>
@@ -858,10 +861,15 @@ return wrap(<>
 </div>
 {items.map(m=><div key={m._ri+"-"+m._i} style={{display:"flex",alignItems:"center",gap:6,padding:"4px 0",borderTop:"1px solid #1a1a1a",marginTop:4}}>
 <span style={{fontSize:10,color:"#888",flex:1,minWidth:0}}>{m._hn} → {m._rn}</span>
+{m._canEdit?<>
 <input type="number" value={m.q} min={0} onChange={e=>{const mt=[...(m._room.mt||[])];mt[m._i]={...mt[m._i],q:parseInt(e.target.value)||0};updMatO({...m._room,mt},mt)}} style={{width:40,background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:"2px 3px",color:"#fff",fontSize:10,textAlign:"center",boxSizing:"border-box"}}/>
 <select value={m.s} onChange={e=>{const mt=[...(m._room.mt||[])];mt[m._i]={...mt[m._i],s:e.target.value};updMatO({...m._room,mt},mt)}} style={{background:"#1a1a1a",border:"1px solid #333",borderRadius:4,padding:"2px 3px",color:m.s==="aanwezig"?"#4ade80":m.s==="besteld"?"#facc15":"#f87171",fontSize:9}}>
 <option value="nodig">nodig</option><option value="besteld">besteld</option><option value="aanwezig">aanwezig</option></select>
 <button onClick={()=>{const mt=(m._room.mt||[]).filter((_,j)=>j!==m._i);updMatO({...m._room,mt},mt)}} style={{background:"none",border:"none",color:"#888",cursor:"pointer",fontSize:10,padding:0}}>✕</button>
+</>:<>
+<span style={{fontSize:10,color:"#aaa"}}>×{m.q}</span>
+<span style={{fontSize:9,padding:"2px 6px",borderRadius:4,background:m.s==="aanwezig"?"#0a1f0a":m.s==="besteld"?"#1a1500":"#1a0505",color:m.s==="aanwezig"?"#4ade80":m.s==="besteld"?"#facc15":"#f87171"}}>{m.s}</span>
+</>}
 </div>)}
 </div>)}
 </>)}
