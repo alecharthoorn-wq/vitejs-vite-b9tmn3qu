@@ -158,7 +158,7 @@ const am=U?.p==="admin";
 if(!U){
 const loginWrap=c=><div style={{minHeight:"100vh",background:st.bg,color:st.tx,display:"flex",justifyContent:"center",alignItems:"center",padding:16,fontFamily:"system-ui"}}><div style={{width:"100%",maxWidth:380}}>{c}</div></div>;
 const loginHeader=<div style={{textAlign:"center",marginBottom:20}}><div style={{fontSize:fs(32)}}>🎃</div><h1 style={{fontSize:fs(18),fontWeight:700}}>The Horror Zone</h1></div>;
-const pinInput=(val,set,ph)=><input value={val} onChange={e=>{const v=e.target.value.replace(/\D/g,"").slice(0,4);set(v);sLE("")}} placeholder={ph||"····"} inputMode="numeric" maxLength={4} autoFocus style={{width:"100%",background:st.inp,border:`1px solid ${lE?acRed.bd:st.brd}`,borderRadius:8,padding:"12px 14px",color:st.tx,fontSize:fs(24),textAlign:"center",letterSpacing:12,fontFamily:"monospace",boxSizing:"border-box",marginBottom:6}}/>;
+const pinInput=(val,set,ph)=><input type="password" value={val} onChange={e=>{const v=e.target.value.replace(/\D/g,"").slice(0,4);set(v);sLE("")}} placeholder={ph||"····"} inputMode="numeric" maxLength={4} autoFocus style={{width:"100%",background:st.inp,border:`1px solid ${lE?acRed.bd:st.brd}`,borderRadius:8,padding:"12px 14px",color:st.tx,fontSize:fs(24),textAlign:"center",letterSpacing:12,fontFamily:"monospace",boxSizing:"border-box",marginBottom:6}}/>;
 const backToList=<button onClick={()=>{sLS(null);sLU(null);sLP("");sLP2("");sLE("");sLN("")}} style={{background:"none",border:"none",color:st.txm,fontSize:fs(13),cursor:"pointer",padding:0,marginBottom:10}}>← Terug</button>;
 
 // Stap: pin invoeren
