@@ -7,7 +7,7 @@ const hashPin = async (pin) => {
   return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 };
 const tw=t=>Array.isArray(t.w)?t.w:t.w?[t.w]:[];
-const rMatch=(t,u)=>{if(!u||u.p==="admin")return true;if(tw(t).includes(u.id))return true;const r=u.r;if(t.c===r)return true;if(r==="bouw"&&"ruwbouw,decoratie".includes(t.c))return true;if(r==="deco"&&t.c==="decoratie")return true;return false};
+const rMatch=(t,u)=>{if(!u||u.p==="admin")return true;if(tw(t).includes(u.id))return true;const r=u.r;if(t.c===r)return true;if(r==="bouw"&&"ruwbouw,decoratie,overig".includes(t.c))return true;if(r==="deco"&&t.c==="decoratie")return true;return false};
 
 const DB=[{id:"b1",n:"Ron",r:"bouw",p:"admin"},{id:"b2",n:"Remco",r:"bouw",p:"bouw"},{id:"b3",n:"Sim",r:"deco",p:"decoratie"},{id:"b4",n:"Ricardo",r:"bouw",p:"bouw"},{id:"b5",n:"Koen L",r:"techniek",p:"techniek"},{id:"b6",n:"Jeroen",r:"techniek",p:"techniek"},{id:"b7",n:"Sanna",r:"deco",p:"decoratie"},{id:"b8",n:"Bart",r:"ict",p:"admin"},{id:"b0",n:"Alec",r:"admin",p:"admin"}];
 const DH=[{id:"h1",n:"Hail Mary Hospital",d:"Update in loods",l:"loods",ld:"b1",dl:"2026-11-01"},{id:"h2",n:"Huckabay Highstreet",d:"Update in loods",l:"loods",ld:"b4",dl:"2026-11-01"},{id:"h3",n:"The Barn",d:"Nieuw in tent",l:"tent",ld:"b1",dl:"2026-11-08"},{id:"h4",n:"The Mine",d:"Nieuw in tent",l:"tent",ld:"b4",dl:"2026-11-08"},{id:"h5",n:"The Woods",d:"Bosroute",l:"bos",ld:"b3",dl:"2026-11-08"}];
@@ -16,6 +16,7 @@ const iM=[{id:"m1",n:"Plattegronden definitief",dl:"2026-05-15",d:1,nt:""},{id:"
 const iT=[{id:"t1",r:"r1",h:"h1",ti:"Balie herstellen",s:"in_progress",pr:"high",c:"ruwbouw",w:"b4",dl:"2026-08-15",nt:"",tp:"nodig",sb:[{id:"s1",ti:"Demonteren",d:true},{id:"s2",ti:"Hout vervangen",d:false}]},{id:"t2",r:"r1",h:"h1",ti:"Deco wanden",s:"not_started",pr:"medium",c:"decoratie",w:"b7",dl:"2026-09-01",nt:"",tp:"nice",sb:[]},{id:"t3",r:"r2",h:"h1",ti:"Muren check",s:"not_started",pr:"high",c:"ruwbouw",w:"b1",dl:"2026-08-20",nt:"",tp:"nodig",sb:[]},{id:"t4",r:"r2",h:"h1",ti:"Animatronic",s:"not_started",pr:"high",c:"techniek",w:"b5",dl:"2026-09-15",nt:"Testen!",tp:"nodig",sb:[{id:"s3",ti:"Ophalen",d:false},{id:"s4",ti:"Monteren",d:false}]},{id:"t5",r:"r4",h:"h2",ti:"Gevels updaten",s:"in_progress",pr:"high",c:"decoratie",w:"b3",dl:"2026-08-10",nt:"",tp:"nodig",sb:[]},{id:"t6",r:"r4",h:"h2",ti:"Straatverlichting",s:"not_started",pr:"medium",c:"techniek",w:"b6",dl:"2026-09-20",nt:"",tp:"nice",sb:[]},{id:"t7",r:"r5",h:"h2",ti:"Constructie",s:"not_started",pr:"high",c:"ruwbouw",w:"b4",dl:"2026-08-25",nt:"",tp:"nodig",sb:[]},{id:"t8",r:"r8",h:"h5",ti:"Poort bouw",s:"in_progress",pr:"high",c:"ruwbouw",w:"b3",dl:"2026-07-30",nt:"Demontabel",tp:"nodig",sb:[{id:"s5",ti:"Zagen",d:true},{id:"s6",ti:"Frame",d:false}]},{id:"t9",r:"r9",h:"h5",ti:"Brandveiligheid",s:"not_started",pr:"critical",c:"overig",w:"b1",dl:"2026-07-15",nt:"Gemeente!",tp:"nodig",sb:[]},{id:"t10",r:"r9",h:"h5",ti:"Cirkel",s:"not_started",pr:"medium",c:"decoratie",w:"b7",dl:"2026-09-30",nt:"",tp:"nice",sb:[]}];
 
 const CS=["ruwbouw","decoratie","techniek","kleding","grime","overig"];
+const MA=["bouw","deco","techniek","kleding","grime","overig"];
 const TP=["nodig","gewenst","nice"];
 const TD=new Date().toISOString().split("T")[0];
 const cE=(u,c,t)=>!u?0:u.p==="admin"||u.r===c||u.p===c||(u.r==="bouw"&&"ruwbouw,decoratie".includes(c))||(u.r==="deco"&&c==="decoratie")||(t&&tw(t).includes(u.id));
@@ -47,7 +48,11 @@ return<div style={{...bx,border:"1px solid #dc2626"}}><input value={f.ti} onChan
 
 export default function App(){
 const[R,sR]=useState([]);const[T,sT]=useState([]);const[U,sU]=useState(null);
-const[tb,sTb]=useState("home");const[cH,sCH]=useState(null);const[cR,sCR]=useState(null);
+const[tb,sTb_]=useState(()=>{try{return sessionStorage.getItem("thz_tb")||"home"}catch{return"home"}});
+const sTb=(v)=>{sTb_(v);try{sessionStorage.setItem("thz_tb",v)}catch{}};
+const[cH,sCH_]=useState(null);const[cR,sCR_]=useState(null);
+const sCH=(v)=>{sCH_(v);try{sessionStorage.setItem("thz_cH",v?JSON.stringify({id:v.id}):"")}catch{}};
+const sCR=(v)=>{sCR_(v);try{sessionStorage.setItem("thz_cR",v?JSON.stringify({id:v.id}):"")}catch{}};
 const[eI,sEI]=useState(null);const[eF,sEF]=useState({});const[ld,sLd]=useState(1);
 const[q,sQ]=useState("");const[dB,sDB]=useState([]);const[dT,sDT]=useState([]);
 const[fb,sFb]=useState("");const[fo,sFo]=useState(0);
@@ -61,8 +66,8 @@ const[lS,sLS]=useState(null);const[lU,sLU]=useState(null);const[lP,sLP]=useState
 const[shT,sShT]=useState({});
 const[shM,sShM]=useState({});
 const[dQa,sDQa]=useState(0);const[dQaF,sDQaF]=useState({h:"",r:"",ti:"",w:[]});
-const[matF,sMatF]=useState("all");
-const[nMat,sNMat]=useState({n:"",q:1,s:"nodig",rooms:[]});const[nMatO,sNMatO]=useState(0);
+const[matF,sMatF]=useState("all");const[matHF,sMatHF]=useState("all");const[matAF,sMatAF]=useState("all");
+const[nMat,sNMat]=useState({n:"",q:1,s:"nodig",a:"overig",rooms:[]});const[nMatO,sNMatO]=useState(0);
 const[dagQ,sDagQ]=useState("");
 const[dagW,sDagW]=useState(null);const[dagWp,sDagWp]=useState("");
 const[cTk,sCTk]=useState(null);
@@ -101,6 +106,13 @@ useEffect(()=>{
       sM(data.milestones);
       sDBs(data.people);
       sDHs(data.houses);
+      // Restore navigation position from sessionStorage
+      try{
+        const shJ=sessionStorage.getItem("thz_cH");
+        if(shJ){const o=JSON.parse(shJ);const h=data.houses.find(x=>x.id===o.id);if(h)sCH_(h)}
+        const srJ=sessionStorage.getItem("thz_cR");
+        if(srJ){const o=JSON.parse(srJ);const r=data.rooms.find(x=>x.id===o.id);if(r)sCR_(r)}
+      }catch{}
       if(data.dagstart){
         sDB(data.dagstart.present||[]);
         sDT(data.dagstart.task_ids||[]);
@@ -116,6 +128,20 @@ useEffect(()=>{
   })();
 },[]);
 useEffect(()=>{const h=()=>sW(window.innerWidth);window.addEventListener("resize",h);return()=>window.removeEventListener("resize",h)},[]);
+
+// Poll for updates every 15 seconds (updates data without resetting navigation)
+useEffect(()=>{
+  const poll=async()=>{try{
+    const data=await loadAll();
+    sR(data.rooms);sT(data.tasks);sM(data.milestones);sDBs(data.people);sDHs(data.houses);
+    if(data.dagstart){sDB(data.dagstart.present||[]);sDT(data.dagstart.task_ids||[])}
+    // Refresh current room/house objects with latest data
+    sCR_(prev=>prev?data.rooms.find(x=>x.id===prev.id)||prev:prev);
+    sCH_(prev=>prev?data.houses.find(x=>x.id===prev.id)||prev:prev);
+  }catch{}};
+  const iv=setInterval(poll,15000);
+  return()=>clearInterval(iv);
+},[]);
 
 // Terug-knop telefoon
 useEffect(()=>{window.history.replaceState({app:1},"")},[]);
@@ -267,9 +293,13 @@ return<div style={{...bx,padding:7,marginBottom:4,borderColor:od?acRed.bd:t.tp==
 </div>
 {t.nt&&<div style={{fontSize:fs(13),color:acYellow.tx,marginTop:2}}>⚠ {t.nt}</div>}
 </div>
-{ed&&<div style={{display:"flex",gap:2,flexShrink:0}}>
+{ed?<div style={{display:"flex",gap:2,flexShrink:0}}>
 <button onClick={()=>{sEI(t.id)}} style={{background:"none",border:"none",color:st.txm,cursor:"pointer",fontSize:fs(14),padding:2}}>✏️</button>
 {(st2>0||ed)&&<button onClick={()=>sShT(p=>({...p,[t.id]:!p[t.id]}))} style={{background:"none",border:"none",color:st.txm,cursor:"pointer",fontSize:fs(14),padding:2}}>{sh?"▲":"▼"}</button>}
+</div>
+:<div style={{display:"flex",gap:2,flexShrink:0,alignItems:"center"}}>
+<span title="Geen bewerkrechten — je bent niet toegewezen aan deze taak of kamer" style={{fontSize:fs(13),color:st.txd,cursor:"help"}}>🔒</span>
+{st2>0&&<button onClick={()=>sShT(p=>({...p,[t.id]:!p[t.id]}))} style={{background:"none",border:"none",color:st.txm,cursor:"pointer",fontSize:fs(14),padding:2}}>{sh?"▲":"▼"}</button>}
 </div>}
 </div>
 {sh&&<div style={{marginTop:5,paddingLeft:24}}>
@@ -386,7 +416,7 @@ if(cR){const rm=cR,ho=DHs.find(x=>x.id===rm.h),rt=T.filter(t=>t.r===rm.id),pr=rP
   const materialsBlock=<div>
   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}>
   <span style={{fontSize:fs(13),color:st.txm,fontWeight:700,letterSpacing:2,textTransform:"uppercase"}}>Materialen ({(rm.mt||[]).length})</span>
-  {canER&&<button onClick={()=>updMat([...(rm.mt||[]),{n:"",q:1,s:"nodig"}])} style={{background:"none",border:"none",color:st.rd,cursor:"pointer",fontSize:fs(14),fontWeight:700}}>+</button>}
+  {canER&&<button onClick={()=>updMat([...(rm.mt||[]),{n:"",q:1,s:"nodig",a:"overig"}])} style={{background:"none",border:"none",color:st.rd,cursor:"pointer",fontSize:fs(14),fontWeight:700}}>+</button>}
   </div>
   {(rm.mt||[]).length===0?<div style={{...bx,fontSize:fs(13),color:st.txm,textAlign:"center",padding:8}}>Geen materialen</div>
   :(rm.mt||[]).map((m,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:6,...bx,padding:7,marginBottom:4}}>
@@ -395,9 +425,12 @@ if(cR){const rm=cR,ho=DHs.find(x=>x.id===rm.h),rt=T.filter(t=>t.r===rm.id),pr=rP
   <input type="number" value={m.q} min={0} onChange={e=>{const mt=[...(rm.mt||[])];mt[i]={...mt[i],q:parseInt(e.target.value)||0};updMat(mt)}} style={{width:44,background:st.inp,border:`1px solid ${st.brd}`,borderRadius:4,padding:"3px 4px",color:st.tx,fontSize:fs(13),textAlign:"center",boxSizing:"border-box"}}/>
   <select value={m.s} onChange={e=>{const mt=[...(rm.mt||[])];mt[i]={...mt[i],s:e.target.value};updMat(mt)}} style={{background:st.inp,border:`1px solid ${st.brd}`,borderRadius:4,padding:"3px 4px",color:m.s==="aanwezig"?"#4ade80":m.s==="besteld"?"#facc15":"#f87171",fontSize:fs(13)}}>
   <option value="nodig">nodig</option><option value="besteld">besteld</option><option value="aanwezig">aanwezig</option></select>
+  <select value={m.a||"overig"} onChange={e=>{const mt=[...(rm.mt||[])];mt[i]={...mt[i],a:e.target.value};updMat(mt)}} style={{background:st.inp,border:`1px solid ${st.brd}`,borderRadius:4,padding:"3px 4px",color:st.txm,fontSize:fs(13)}}>
+  {MA.map(a=><option key={a} value={a}>{a}</option>)}</select>
   <button onClick={()=>{const mt=(rm.mt||[]).filter((_,j)=>j!==i);updMat(mt)}} style={{background:"none",border:"none",color:st.txm,cursor:"pointer",fontSize:fs(13),padding:0}}>✕</button>
   </>:<>
   <span style={{fontSize:fs(13),flex:1,color:st.txm}}>{m.n||"—"}</span>
+  {m.a&&m.a!=="overig"&&<span style={{fontSize:fs(13),padding:"1px 5px",borderRadius:3,background:st.inp,color:st.txd}}>{m.a}</span>}
   <span style={{fontSize:fs(13),color:st.txm}}>×{m.q}</span>
   <span style={{fontSize:fs(13),padding:"2px 6px",borderRadius:4,background:matSt(m.s).bg,color:matSt(m.s).tx}}>{m.s}</span>
   </>}
@@ -442,16 +475,20 @@ if(cR){const rm=cR,ho=DHs.find(x=>x.id===rm.h),rt=T.filter(t=>t.r===rm.id),pr=rP
   :<div style={{display:"flex",gap:4,flexWrap:"wrap",marginBottom:8}}>{rm.cr.map(id=>{const b=DBs.find(x=>x.id===id);return b?<span key={id} style={{fontSize:fs(13),padding:"2px 6px",background:st.inp,borderRadius:4,color:st.txm}}>{b.n}</span>:null})}</div>}
   {rm.nt&&<div style={{marginBottom:8,padding:6,background:acYellow.bg,border:`1px solid ${acYellow.bd}`,borderRadius:6,fontSize:fs(13),color:acYellow.tx}}>⚠ {rm.nt}</div>}
   <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:fs(13),color:st.txm,fontWeight:700,letterSpacing:2,textTransform:"uppercase"}}>Materialen</span>
-  {canER&&<button onClick={()=>updMat([...(rm.mt||[]),{n:"",q:1,s:"nodig"}])} style={{background:"none",border:"none",color:st.rd,cursor:"pointer",fontSize:fs(14)}}>+</button>}</div>
+  {canER&&<button onClick={()=>updMat([...(rm.mt||[]),{n:"",q:1,s:"nodig",a:"overig"}])} style={{background:"none",border:"none",color:st.rd,cursor:"pointer",fontSize:fs(14)}}>+</button>}</div>
   {(rm.mt||[]).map((m,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:4,...bx,padding:5}}>
   {canER?<>
   <input value={m.n} onChange={e=>{const mt=[...(rm.mt||[])];mt[i]={...mt[i],n:e.target.value};sCR({...rm,mt})}} onBlur={()=>updateRoom(rm)} placeholder="Naam…" style={{flex:1,background:st.inp,border:`1px solid ${st.brd}`,borderRadius:4,padding:"2px 5px",color:st.tx,fontSize:fs(13),boxSizing:"border-box",minWidth:0}}/>
   <input type="number" value={m.q} min={0} onChange={e=>{const mt=[...(rm.mt||[])];mt[i]={...mt[i],q:parseInt(e.target.value)||0};updMat(mt)}} style={{width:38,background:st.inp,border:`1px solid ${st.brd}`,borderRadius:4,padding:"2px 3px",color:st.tx,fontSize:fs(13),textAlign:"center",boxSizing:"border-box"}}/>
   <select value={m.s} onChange={e=>{const mt=[...(rm.mt||[])];mt[i]={...mt[i],s:e.target.value};updMat(mt)}} style={{background:st.inp,border:`1px solid ${st.brd}`,borderRadius:4,padding:"2px 3px",color:m.s==="aanwezig"?"#4ade80":m.s==="besteld"?"#facc15":"#f87171",fontSize:fs(13)}}>
   <option value="nodig">nodig</option><option value="besteld">besteld</option><option value="aanwezig">aanwezig</option></select>
+  <select value={m.a||"overig"} onChange={e=>{const mt=[...(rm.mt||[])];mt[i]={...mt[i],a:e.target.value};updMat(mt)}} style={{background:st.inp,border:`1px solid ${st.brd}`,borderRadius:4,padding:"2px 3px",color:st.txd,fontSize:fs(13)}}>
+  {MA.map(a=><option key={a} value={a}>{a}</option>)}</select>
   <button onClick={()=>{const mt=(rm.mt||[]).filter((_,j)=>j!==i);updMat(mt)}} style={{background:"none",border:"none",color:st.txm,cursor:"pointer",fontSize:fs(13),padding:0}}>✕</button>
   </>:<>
-  <span style={{fontSize:fs(13),flex:1,color:st.txm}}>{m.n||"—"}</span><span style={{fontSize:fs(13),color:st.txm}}>×{m.q}</span>
+  <span style={{fontSize:fs(13),flex:1,color:st.txm}}>{m.n||"—"}</span>
+  {m.a&&m.a!=="overig"&&<span style={{fontSize:fs(13),padding:"1px 4px",borderRadius:3,background:st.inp,color:st.txd}}>{m.a}</span>}
+  <span style={{fontSize:fs(13),color:st.txm}}>×{m.q}</span>
   <span style={{fontSize:fs(13),color:m.s==="aanwezig"?"#4ade80":m.s==="besteld"?"#facc15":"#f87171"}}>{m.s}</span>
   </>}
   </div>)}
@@ -869,15 +906,18 @@ if(tb==="mat"){
 const canERm=(room)=>{const rt=T.filter(t=>t.r===room.id);return am||(room.cr||[]).includes(U?.id)||rt.some(t=>cE(U,t.c,t))};
 const allMat=[];R.forEach(r=>{const h=DHs.find(x=>x.id===r.h);(r.mt||[]).forEach((m,i)=>allMat.push({...m,_ri:r.id,_i:i,_rn:r.n,_hn:h?.n||"?",_room:r,_canEdit:canERm(r)}))});
 const mNodig=allMat.filter(m=>m.s==="nodig").length,mBesteld=allMat.filter(m=>m.s==="besteld").length,mAanwezig=allMat.filter(m=>m.s==="aanwezig").length;
-const filtered=matF==="all"?allMat:allMat.filter(m=>m.s===matF);
+const filtered=(matF==="all"?allMat:allMat.filter(m=>m.s===matF)).filter(m=>matHF==="all"||m._room.h===matHF).filter(m=>matAF==="all"||(m.a||"overig")===matAF);
 const hasAnyEdit=allMat.some(m=>m._canEdit)||am;
+
+// Huizen die materialen hebben
+const matHouses=[...new Set(allMat.map(m=>m._room.h))].map(hid=>DHs.find(x=>x.id===hid)).filter(Boolean);
 
 // Groepeer op materiaalnaam (case-insensitive)
 const byName={};filtered.forEach(m=>{const key=(m.n||"").toLowerCase().trim()||"_leeg_"+m._ri+"_"+m._i;if(!byName[key])byName[key]={n:m.n,items:[]};byName[key].items.push(m)});
 const matNames=Object.values(byName).sort((a,b)=>(a.n||"").localeCompare(b.n||""));
 
 const updMatO=async(room,newMt)=>{const up={...room,mt:newMt};await updateRoom(up)};
-const addMatToRooms=async()=>{const naam=nMat.n.trim();if(!naam||nMat.rooms.length===0)return;for(const rid of nMat.rooms){const room=R.find(x=>x.id===rid);if(room){const newMt=[...(room.mt||[]),{n:naam,q:nMat.q,s:nMat.s}];await updMatO(room,newMt)}}sNMat({n:"",q:1,s:"nodig",rooms:[]});sNMatO(0)};
+const addMatToRooms=async()=>{const naam=nMat.n.trim();if(!naam||nMat.rooms.length===0)return;for(const rid of nMat.rooms){const room=R.find(x=>x.id===rid);if(room){const newMt=[...(room.mt||[]),{n:naam,q:nMat.q,s:nMat.s,a:nMat.a}];await updMatO(room,newMt)}}sNMat({n:"",q:1,s:"nodig",a:"overig",rooms:[]});sNMatO(0)};
 const editableRooms=R.filter(r=>canERm(r));
 
 return wrap(<>
@@ -888,14 +928,27 @@ return wrap(<>
 <button key={x.f} onClick={()=>sMatF(matF===x.f?"all":x.f)} style={{...bx,textAlign:"center",padding:isDesktop?10:6,cursor:"pointer",border:`1px solid ${matF===x.f?x.c:st.bd}`,color:st.tx}}><div style={{fontSize:fs(isDesktop?10:8),color:st.txm}}>{x.l}</div><div style={{fontSize:fs(isDesktop?26:20),fontWeight:700,color:x.c}}>{x.v}</div></button>)}
 </div>
 
+{matHouses.length>1&&<div style={{display:"flex",gap:6,marginBottom:isDesktop?14:10}}>
+<select value={matHF} onChange={e=>sMatHF(e.target.value)} style={{flex:1,background:st.inp,border:`1px solid ${st.brd}`,borderRadius:6,padding:"6px 10px",color:st.tx,fontSize:fs(13),boxSizing:"border-box"}}>
+<option value="all">Alle huizen</option>
+{matHouses.map(h=><option key={h.id} value={h.id}>{h.n}</option>)}
+</select>
+<select value={matAF} onChange={e=>sMatAF(e.target.value)} style={{flex:1,background:st.inp,border:`1px solid ${st.brd}`,borderRadius:6,padding:"6px 10px",color:st.tx,fontSize:fs(13),boxSizing:"border-box"}}>
+<option value="all">Alle afdelingen</option>
+{MA.map(a=><option key={a} value={a}>{a}</option>)}
+</select>
+</div>}
+
 {editableRooms.length>0&&(!nMatO?<button onClick={()=>sNMatO(1)} style={{width:"100%",background:st.rd,color:st.tx,border:"none",borderRadius:8,padding:"8px 12px",cursor:"pointer",fontSize:fs(14),fontWeight:600,marginBottom:isDesktop?14:10}}>+ Nieuw materiaal toevoegen</button>
 :<div style={{...bx,border:`1px solid ${st.rd}`,padding:12,marginBottom:isDesktop?14:10}}>
-<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}><span style={{fontSize:fs(14),fontWeight:600}}>Nieuw materiaal</span><button onClick={()=>{sNMatO(0);sNMat({n:"",q:1,s:"nodig",rooms:[]})}} style={{background:"none",border:"none",color:st.txm,cursor:"pointer",fontSize:fs(14)}}>✕</button></div>
-<div style={{display:"grid",gridTemplateColumns:"2fr 1fr 1fr",gap:5,marginBottom:8}}>
-<input value={nMat.n} onChange={e=>sNMat({...nMat,n:e.target.value})} placeholder="Materiaalnaam…" style={{background:st.inp,border:`1px solid ${st.brd}`,borderRadius:4,padding:5,color:st.tx,fontSize:fs(13),boxSizing:"border-box"}}/>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}><span style={{fontSize:fs(14),fontWeight:600}}>Nieuw materiaal</span><button onClick={()=>{sNMatO(0);sNMat({n:"",q:1,s:"nodig",a:"overig",rooms:[]})}} style={{background:"none",border:"none",color:st.txm,cursor:"pointer",fontSize:fs(14)}}>✕</button></div>
+<div style={{display:"grid",gridTemplateColumns:isDesktop?"3fr 1fr 1fr 1fr":"1fr 1fr",gap:5,marginBottom:8}}>
+<input value={nMat.n} onChange={e=>sNMat({...nMat,n:e.target.value})} placeholder="Materiaalnaam…" style={{background:st.inp,border:`1px solid ${st.brd}`,borderRadius:4,padding:5,color:st.tx,fontSize:fs(13),boxSizing:"border-box",gridColumn:isDesktop?"auto":"1 / -1"}}/>
 <input type="number" value={nMat.q} min={1} onChange={e=>sNMat({...nMat,q:parseInt(e.target.value)||1})} style={{background:st.inp,border:`1px solid ${st.brd}`,borderRadius:4,padding:5,color:st.tx,fontSize:fs(13),textAlign:"center",boxSizing:"border-box"}}/>
 <select value={nMat.s} onChange={e=>sNMat({...nMat,s:e.target.value})} style={{background:st.inp,border:`1px solid ${st.brd}`,borderRadius:4,padding:5,color:nMat.s==="aanwezig"?"#4ade80":nMat.s==="besteld"?"#facc15":"#f87171",fontSize:fs(13)}}>
 <option value="nodig">nodig</option><option value="besteld">besteld</option><option value="aanwezig">aanwezig</option></select>
+<select value={nMat.a} onChange={e=>sNMat({...nMat,a:e.target.value})} style={{background:st.inp,border:`1px solid ${st.brd}`,borderRadius:4,padding:5,color:st.txm,fontSize:fs(13),gridColumn:isDesktop?"auto":"1 / -1"}}>
+{MA.map(a=><option key={a} value={a}>{a}</option>)}</select>
 </div>
 <div style={{fontSize:fs(13),color:st.txm,fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>Toevoegen aan kamers</div>
 <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:8}}>
@@ -914,10 +967,13 @@ return wrap(<>
 <span style={{fontSize:fs(13),color:st.txm,flex:1,minWidth:0}}>{m._hn} → {m._rn}</span>
 {m._canEdit?<>
 <input type="number" value={m.q} min={0} onChange={e=>{const mt=[...(m._room.mt||[])];mt[m._i]={...mt[m._i],q:parseInt(e.target.value)||0};updMatO({...m._room,mt},mt)}} style={{width:40,background:st.inp,border:`1px solid ${st.brd}`,borderRadius:4,padding:"2px 3px",color:st.tx,fontSize:fs(13),textAlign:"center",boxSizing:"border-box"}}/>
+<select value={m.a||"overig"} onChange={e=>{const mt=[...(m._room.mt||[])];mt[m._i]={...mt[m._i],a:e.target.value};updMatO({...m._room,mt},mt)}} style={{background:st.inp,border:`1px solid ${st.brd}`,borderRadius:4,padding:"2px 3px",color:st.txd,fontSize:fs(13)}}>
+{MA.map(a=><option key={a} value={a}>{a}</option>)}</select>
 <select value={m.s} onChange={e=>{const mt=[...(m._room.mt||[])];mt[m._i]={...mt[m._i],s:e.target.value};updMatO({...m._room,mt},mt)}} style={{background:st.inp,border:`1px solid ${st.brd}`,borderRadius:4,padding:"2px 3px",color:m.s==="aanwezig"?"#4ade80":m.s==="besteld"?"#facc15":"#f87171",fontSize:fs(13)}}>
 <option value="nodig">nodig</option><option value="besteld">besteld</option><option value="aanwezig">aanwezig</option></select>
 <button onClick={()=>{const mt=(m._room.mt||[]).filter((_,j)=>j!==m._i);updMatO({...m._room,mt},mt)}} style={{background:"none",border:"none",color:st.txm,cursor:"pointer",fontSize:fs(13),padding:0}}>✕</button>
 </>:<>
+{m.a&&m.a!=="overig"&&<span style={{fontSize:fs(13),padding:"1px 5px",borderRadius:3,background:st.inp,color:st.txd}}>{m.a}</span>}
 <span style={{fontSize:fs(13),color:st.txm}}>×{m.q}</span>
 <span style={{fontSize:fs(13),padding:"2px 6px",borderRadius:4,background:matSt(m.s).bg,color:matSt(m.s).tx}}>{m.s}</span>
 </>}
